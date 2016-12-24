@@ -1,5 +1,6 @@
 <?php
 
+use RedBeanPHP\R;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
@@ -20,9 +21,9 @@ $app->post('/login', function (Request $request, Response $response, $args) use 
     $email = $request->getParam('email');
     $password = $request->getParam('password');
 
-    $user_id = R::getCell("SELECT id FROM users WHERE status = 'active' AND email = :email AND password = :password", [
-        'email' => $email,
-        'password' => md5($password)
+    $user_id = R::getCell("SELECT usr_id FROM users WHERE usr_status = 'active' AND usr_email = :usr_email AND usr_password = :usr_password", [
+        'usr_email' => $email,
+        'usr_password' => md5($password)
     ]);
 
     if ($user_id) {
@@ -52,9 +53,9 @@ $app->post('/register', function (Request $request, Response $response, $args) u
         return $response->withRedirect('/register');
     }
 
-    R::exec("INSERT INTO users (status, email, password) VALUES ('active', :email, :password)", [
-        'email' => $email,
-        'password' => md5($password)
+    R::exec("INSERT INTO users (usr_status, usr_email, usr_password) VALUES ('active', :usr_email, :usr_password)", [
+        'usr_email' => $email,
+        'usr_password' => md5($password)
     ]);
 
     $this->flash->addMessage('success', "You may login now");

@@ -1,5 +1,6 @@
 <?php
 
+use RedBeanPHP\R;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
@@ -37,7 +38,7 @@ require __DIR__ . '/../src/functions.php';
 require __DIR__ . '/../src/dependencies.php';
 
 // Add database
-R::addDatabase("");
+R::addDatabase('panel', 'mysql:host=' . $_ENV['DB_HOST'] . ';port=' . $_ENV['DB_PORT'] . ';dbname=' . $_ENV['DB_DATABASE'], $_ENV['DB_USERNAME'], $_ENV['DB_PASSWORD'], true);
 
 // User Auth
 $user_auth = function (Request $request, Response $response, $next) use ($app) {
