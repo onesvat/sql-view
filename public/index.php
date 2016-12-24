@@ -36,6 +36,9 @@ require __DIR__ . '/../src/functions.php';
 // Add dependencies
 require __DIR__ . '/../src/dependencies.php';
 
+// Add database
+R::addDatabase("");
+
 // User Auth
 $user_auth = function (Request $request, Response $response, $next) use ($app) {
 
@@ -45,7 +48,7 @@ $user_auth = function (Request $request, Response $response, $next) use ($app) {
     }
 
     // Check user
-    $user = R::getRow("SELECT * FROM users WHERE usr_id = :usr_id", ['usr_id' => $_SESSION['usr_id']]);
+    $user = R::getRow("SELECT * FROM users WHERE id = :user_id", ['user_id' => $_SESSION['user_id']]);
 
     if (!$user) {
         return $response->withRedirect("/login?url=" . $_SERVER['REQUEST_URI']);
