@@ -66,5 +66,8 @@ $user_auth = function (Request $request, Response $response, $next) use ($app) {
 // Add routes
 require __DIR__ . '/../src/routes/home_route.php';
 require __DIR__ . '/../src/routes/dashboard_route.php';
+require __DIR__ . '/../src/routes/database_route.php';
+require __DIR__ . '/../src/routes/query_route.php';
+require __DIR__ . '/../src/routes/setting_route.php';
 
 $app->run();
