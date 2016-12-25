@@ -38,7 +38,7 @@ require __DIR__ . '/../src/functions.php';
 require __DIR__ . '/../src/dependencies.php';
 
 // Add database
-R::addDatabase('panel', 'mysql:host=' . $_ENV['DB_HOST'] . ';port=' . $_ENV['DB_PORT'] . ';dbname=' . $_ENV['DB_DATABASE'], $_ENV['DB_USERNAME'], $_ENV['DB_PASSWORD'], true);
+R::setup('mysql:host=' . $_ENV['DB_HOST'] . ';port=' . $_ENV['DB_PORT'] . ';dbname=' . $_ENV['DB_DATABASE'], $_ENV['DB_USERNAME'], $_ENV['DB_PASSWORD'], true);
 
 // User Auth
 $user_auth = function (Request $request, Response $response, $next) use ($app) {
@@ -49,7 +49,7 @@ $user_auth = function (Request $request, Response $response, $next) use ($app) {
     }
 
     // Check user
-    $user = R::getRow("SELECT * FROM users WHERE id = :user_id", ['user_id' => $_SESSION['user_id']]);
+    $user = R::getRow("SELECT * FROM users WHERE usr_id = :usr_id", ['usr_id' => $_SESSION['usr_id']]);
 
     if (!$user) {
         return $response->withRedirect("/login?url=" . $_SERVER['REQUEST_URI']);
@@ -65,5 +65,6 @@ $user_auth = function (Request $request, Response $response, $next) use ($app) {
 
 // Add routes
 require __DIR__ . '/../src/routes/home_route.php';
+require __DIR__ . '/../src/routes/dashboard_route.php';
 
 $app->run();

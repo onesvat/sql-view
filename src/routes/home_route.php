@@ -21,19 +21,22 @@ $app->post('/login', function (Request $request, Response $response, $args) use 
     $email = $request->getParam('email');
     $password = $request->getParam('password');
 
-    $user_id = R::getCell("SELECT usr_id FROM users WHERE usr_status = 'active' AND usr_email = :usr_email AND usr_password = :usr_password", [
+    $usr_id = R::getCell("SELECT usr_id FROM users WHERE usr_status = 'active' AND usr_email = :usr_email AND usr_password = :usr_password", [
         'usr_email' => $email,
         'usr_password' => md5($password)
     ]);
 
-    if ($user_id) {
+    if ($usr_id) {
         $_SESSION['login'] = true;
-        $_SESSION['user_id'] = $user_id;
-    } else {
-        $this->flash->addMessage('danger', "Your email or password is wrong");
+        $_SESSION['usr_id'] = $usr_id;
 
-        return $response->withRedirect('/login');
+        return $response->withRedirect('/dashboard');
     }
+
+    $this->flash->addMessage('danger', "Your email or password is wrong");
+
+    return $response->withRedirect('/login');
+
 });
 
 $app->get('/register', function (Request $request, Response $response, $args) use ($app) {
