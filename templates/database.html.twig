@@ -58,8 +58,8 @@
                         <tbody>
                         {% for database in databases %}
                             <tr>
-                                <td>{{ database.name }}</td>
-                                <td>{{ database.server }}</td>
+                                <td>{{ database.dtb_name }}</td>
+                                <td>{{ database.conn.con_host }}</td>
                                 <td>{{ database.queries }}</td>
                                 <td>
                                     <a href="/database/edit/{{ database.dtb_id }}" class="btn btn-primary">Edit</a>
