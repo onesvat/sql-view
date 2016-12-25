@@ -10,3 +10,7 @@ $app->get('/query', function (Request $request, Response $response, $args) use (
 $app->post('/query', function (Request $request, Response $response, $args) use ($app) {
 
 });
+
+$app->get('/query/cached', function (Request $request, Response $response, $args) use ($app) {
+
+});
