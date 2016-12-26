@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% include 'inc/header.html.twig' %}
+    <style type="text/css" media="screen">
+        #editor {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+    </style>
+
+    <title>SQLView - Dashboard</title>
+</head>
+
+<body>
+
+{% include 'inc/nav.html.twig' with {'page': 'query'} %}
+
+<div id="wrapper">
+
+    <div class="container">
+
+        <div class="row">
+            <div class="col-lg-4">
+                <div id="tree">
+
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <pre id="editor" style="height: 120px;">SELECT * FROM users;</pre>
+            </div>
+        </div>
+
+
+    </div><!-- /.container -->
+
+</div>
+<!-- /#wrapper -->
+
+{% include 'inc/footer.html.twig' %}
+
+
+<script>
+    function getTree() {
+        // Some logic to retrieve, or generate tree structure
+        return [
+            {
+                text: "Parent 1",
+                nodes: [
+                    {
+                        text: "Child 1",
+                        nodes: [
+                            {
+                                text: "Grandchild 1"
+                            },
+                            {
+                                text: "Grandchild 2"
+                            }
+                        ]
+                    },
+                    {
+                        text: "Child 2"
+                    }
+                ]
+            },
+            {
+                text: "Parent 2"
+            },
+            {
+                text: "Parent 3"
+            },
+            {
+                text: "Parent 4"
+            },
+            {
+                text: "Parent 5"
+            }
+        ];
+    }
+
+    $('#tree').treeview({data: getTree()});
+</script>
+
+<script>
+    ace.require("ace/ext/language_tools");
+    var editor = ace.edit("editor");
+    editor.session.setMode("ace/mode/sql");
+    // enable autocompletion and snippets
+    editor.setOptions({
+        enableBasicAutocompletion: true,
+        enableSnippets: true,
+        enableLiveAutocompletion: false
+    });
+    editor.$blockScrolling = Infinity;
+</script>
+
+</body>
+
+</html>

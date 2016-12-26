@@ -1,0 +1,18 @@
+.treeview .list-group-item {
+    cursor: pointer
+}
+
+.treeview span.indent {
+    margin-left: 3px;
+    margin-right: 3px
+}
+
+.treeview span.icon {
+    width: 12px;
+    margin-right: 2px
+}
+
+.treeview .node-disabled {
+    color: silver;
+    cursor: not-allowed
+}

@@ -15,16 +15,16 @@ CREATE TABLE `caches` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-DROP TABLE IF EXISTS `databases`;
-CREATE TABLE `databases` (
-  `dtb_id` int(11) NOT NULL AUTO_INCREMENT,
-  `dtb_user` int(11) NOT NULL,
-  `dtb_name` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
-  `dtb_type` enum('mysql','postgresql') COLLATE utf8_unicode_ci NOT NULL,
-  `dtb_connection` text COLLATE utf8_unicode_ci NOT NULL,
-  `dtb_access_date` timestamp NOT NULL,
-  `dtb_created_date` timestamp NOT NULL,
-  PRIMARY KEY (`dtb_id`)
+DROP TABLE IF EXISTS `connections`;
+CREATE TABLE `connections` (
+  `cnn_id` int(11) NOT NULL AUTO_INCREMENT,
+  `cnn_user` int(11) NOT NULL,
+  `cnn_name` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
+  `cnn_type` enum('mysql','postgresql') COLLATE utf8_unicode_ci NOT NULL,
+  `cnn_connection` text COLLATE utf8_unicode_ci NOT NULL,
+  `cnn_access_date` timestamp NULL DEFAULT NULL,
+  `cnn_created_date` timestamp NOT NULL,
+  PRIMARY KEY (`cnn_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
@@ -49,4 +49,4 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
--- 2016-12-25 13:35:41
+-- 2016-12-26 15:53:40
