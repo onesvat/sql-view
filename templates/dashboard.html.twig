@@ -13,7 +13,9 @@
 <div id="wrapper">
 
     <div class="container">
-
+        {% if connection_error == "true" %}
+            {% include 'inc/connection_error.html.twig' with {'page': 'dashboard'} %}
+        {% endif %}
 
     </div><!-- /.container -->
 

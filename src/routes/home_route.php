@@ -7,7 +7,7 @@ use Slim\Http\Response;
 $app->get('/', function (Request $request, Response $response, $args) use ($app) {
     $app->extra['messages'] = $this->flash->getMessages();
 
-    return $response->withRedirect('/dashboard', array_merge($app->extra, $args));
+    return $response->withRedirect('/dashboard');
 })->add($user_auth);
 
 

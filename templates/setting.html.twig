@@ -44,7 +44,11 @@
                                             <tr>
                                                 <td>{{ connection.cnn_name }}</td>
                                                 <td>{{ connection.conn.cnn_host }}</td>
-                                                <td>{{ connection.queries }}</td>
+                                                <td>{{ connection.queries }}
+
+                                                    {{ connection.connection_status }}
+
+                                                </td>
                                                 <td>
                                                     <a href="/database/edit/{{ connection.cnn_id }}"
                                                        class="btn btn-xs btn-primary">Edit</a>
