@@ -69,12 +69,34 @@ $app->post('/setting/connection/new', function (Request $request, Response $resp
 $app->get('/setting/connection/edit/{cnn_id}', function (Request $request, Response $response, $args) use ($app) {
 
     $args = R::getRow("SELECT * FROM connections WHERE cnn_id = :cnn_id", ['cnn_id' => $args['cnn_id']]);
-    $args = json_decode($args['cnn_connection'], true);
+    $args = array_merge(json_decode($args['cnn_connection'], true), $args);
     return $this->view->render($response, 'setting_connection_edit.html.twig', array_merge($app->extra, $args));
 })->add($user_auth);
 
 $app->post('/setting/connection/edit/{cnn_id}', function (Request $request, Response $response, $args) use ($app) {
 
+
+    $cnn_connection = json_encode(
+        [
+            'cnn_username' => $request->getParam('cnn_username'),
+            'cnn_password' => $request->getParam('cnn_password'),
+            'cnn_host' => $request->getParam('cnn_host'),
+            'cnn_port' => $request->getParam('cnn_port'),
+            'cnn_database' => $request->getParam('cnn_database')
+        ]);
+
+
+    R::exec("UPDATE connections SET cnn_user = :cnn_user, cnn_name = :cnn_name, cnn_type = :cnn_type, cnn_connection = :cnn_connection, cnn_created_date = :cnn_created_date, cnn_access_date = :cnn_access_date WHERE cnn_id = :cnn_id", [
+        'cnn_user' => $_SESSION['usr_id'],
+        'cnn_name' => $request->getParam('cnn_name'),
+        'cnn_type' => $request->getParam('cnn_type'),
+        'cnn_connection' => $cnn_connection,
+        'cnn_created_date' => date('Y-m-d H:i:s'),
+        'cnn_access_date' => null,
+        'cnn_id' => $args['cnn_id'],
+    ]);
+
+    return $response->withRedirect("/setting");
 
 })->add($user_auth);
 
@@ -94,6 +116,34 @@ $app->get('/setting/connection/change/{connection_id}', function (Request $reque
     return $response->withRedirect("/dashboard");
 
 })->add($user_auth);
+
+
+$app->post('/setting/connection/check/ajax', function (Request $request, Response $response, $args) use ($app) {
+
+    if ($request->getParam('cnn_type') == "mysql") {
+        try {
+            $app->connection = new PDO(
+                "mysql:host=" . $request->getParam('cnn_host') . ";dbname=" . $request->getParam('cnn_database'),
+                $request->getParam('cnn_username'),
+                $request->getParam('cnn_password'),
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
+                ]
+            );
+        } catch (Exception $e) {
+            echo json_encode(['success' => false]);
+            die;
+        }
+    }
+
+    echo json_encode(['success' => true]);
+    die;
+
+
+})->add($user_auth);
+
+
 
 
 

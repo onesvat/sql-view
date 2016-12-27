@@ -30,7 +30,7 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-lg-12">
-                                <form class="form-horizontal" method="post">
+                                <form class="form-horizontal" method="post" id="connection_form">
                                     <div class="form-group">
                                         <label for="cnn_name" class="col-sm-2 control-label">Name</label>
                                         <div class="col-sm-10">
@@ -90,8 +90,28 @@
                                     <div class="form-group">
                                         <div class="col-sm-offset-2 col-sm-10">
                                             <button type="submit" class="btn btn-default">Save</button>
+                                            <a class="btn btn-default" id="check_button">Check
+                                                Connection
+                                            </a>
+
                                         </div>
                                     </div>
+
+                                    <div class="alert alert-success" style="display: none;"
+                                         id="check_status_success">
+                                        <button type="button" class="close" data-dismiss="alert"
+                                                aria-hidden="true">&times;</button>
+                                        <strong>Connection Established</strong>
+                                    </div>
+
+                                    <div class="alert alert-danger" style="display: none;"
+                                         id="check_status_error">
+                                        <button type="button" class="close" data-dismiss="alert"
+                                                aria-hidden="true">&times;</button>
+                                        <strong>Connection Error</strong>
+                                    </div>
+
+
                                 </form>
                             </div>
                         </div>
@@ -107,6 +127,34 @@
 <!-- /#wrapper -->
 
 {% include 'inc/footer.html.twig' %}
+
+
+<script>
+
+    $('#check_button').click(function (e) {
+        $('#check_status_success').hide();
+        $('#check_status_success').hide();
+        e.preventDefault();
+        var formData = $('#connection_form').serialize();
+        $.ajax({
+            url: "/setting/connection/check/ajax",
+            type: "POST",
+            data: formData,
+            success: function (data, textStatus, jqXHR) {
+                data = $.parseJSON(data);
+                if (data.success) {
+                    $('#check_status_success').show();
+                } else {
+                    $('#check_status_error').show();
+                }
+            }, error: function (jqXHR, textStatus, errorThrown) {
+
+            }
+        });
+    });
+</script>
+
+
 </body>
 
 </html>

@@ -2,6 +2,7 @@
 
 use Slim\Http\Request;
 use Slim\Http\Response;
+use RedBeanPHP\R;
 
 $app->get('/query', function (Request $request, Response $response, $args) use ($app) {
 
@@ -33,6 +34,7 @@ $app->get('/query', function (Request $request, Response $response, $args) use (
 
     $args['tables'] = $tables;
     $args['tree'] = json_encode($tree);
+    $args['queries'] = R::getAll("SELECT * FROM queries");
 
     return $this->view->render($response, 'query.html.twig', array_merge($app->extra, $args));
 })->add($user_auth);
