@@ -25,7 +25,7 @@ $app->get('/query', function (Request $request, Response $response, $args) use (
         $columns = [];
 
         foreach ($table['columns'] as $column) {
-            $columns[] = ["text" => $column['column_name'] . " - <i>" . $column['column_data_type'] . "</i>"];
+            $columns[] = ["text" => $column['column_name'] . " - <i>" . $column['column_data_type'] . "</i>", 'column_name' => $column['column_name']];
         }
 
         $tree[] = ["text" => $table['table_name'], 'nodes' => $columns, 'state' => ['expanded' => false]];
