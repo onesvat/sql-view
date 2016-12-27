@@ -36,24 +36,25 @@
                                             <th>Connection</th>
                                             <th>Server</th>
                                             <th>Health</th>
-                                            <th width="100">Actions</th>
+                                            <th width="180">Actions</th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         {% for connection in connections %}
-                                            <tr>
+                                            <tr {% if connection.cnn_status == "active" %}style="background-color: #4cae4c"{% endif %}>
                                                 <td>{{ connection.cnn_name }}</td>
                                                 <td>{{ connection.conn.cnn_host }}</td>
-                                                <td>{{ connection.queries }}
-
+                                                <td>
                                                     {{ connection.connection_status }}
-
                                                 </td>
                                                 <td>
-                                                    <a href="/database/edit/{{ connection.cnn_id }}"
+                                                    <a href="/setting/connection/edit/{{ connection.cnn_id }}"
                                                        class="btn btn-xs btn-primary">Edit</a>
                                                     <a href="/query/{{ connection.cnn_id }}"
                                                        class="btn btn-xs btn-primary">Query</a>
+                                                    <a href="/setting/connection/remove/{{ connection.cnn_id }}"
+                                                       class="btn btn-xs btn-danger">Remove</a>
+
                                                 </td>
                                             </tr>
                                         {% endfor %}

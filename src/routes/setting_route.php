@@ -66,16 +66,23 @@ $app->post('/setting/connection/new', function (Request $request, Response $resp
     return $response->withRedirect('/setting');
 })->add($user_auth);
 
-$app->get('/setting/connection/edit/:cnn_id', function (Request $request, Response $response, $args) use ($app) {
+$app->get('/setting/connection/edit/{cnn_id}', function (Request $request, Response $response, $args) use ($app) {
 
+    $args = R::getRow("SELECT * FROM connections WHERE cnn_id = :cnn_id", ['cnn_id' => $args['cnn_id']]);
+    $args = json_decode($args['cnn_connection'], true);
     return $this->view->render($response, 'setting_connection_edit.html.twig', array_merge($app->extra, $args));
 })->add($user_auth);
 
-$app->post('/setting/connection/edit/:cnn_id', function (Request $request, Response $response, $args) use ($app) {
+$app->post('/setting/connection/edit/{cnn_id}', function (Request $request, Response $response, $args) use ($app) {
+
 
 })->add($user_auth);
 
-$app->get('/setting/connection/delete/:cnn_id', function (Request $request, Response $response, $args) use ($app) {
+$app->get('/setting/connection/remove/{cnn_id}', function (Request $request, Response $response, $args) use ($app) {
+
+    R::exec("DELETE FROM connections WHERE cnn_id = :cnn_id", ['cnn_id' => $args['cnn_id']]);
+    R::exec("UPDATE connections SET cnn_status = 'active' WHERE cnn_user = :cnn_user LIMIT 1", ['cnn_user' => $_SESSION['usr_id']]);
+    return $response->withRedirect("/setting");
 
 })->add($user_auth);
 
