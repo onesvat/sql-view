@@ -32,6 +32,27 @@
                 </li>
                 <!-- /.dropdown -->
             </ul>
+
+            <ul class="nav navbar-top-links navbar-right">
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-plug fa-fw"></i> {{ active_connection.cnn_name }} {% if all_connections %}<i
+                                class="fa fa-caret-down">{% endif %}</i>
+                    </a>
+                    {% if all_connections %}
+                        <ul class="dropdown-menu dropdown-user">
+                            {% for connection in all_connections %}
+                                <li>
+                                    <a href="/setting/connection/change/{{ connection.cnn_id }}">{{ connection.cnn_name }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    <!-- /.dropdown-user -->
+                </li>
+                <!-- /.dropdown -->
+            </ul>
+
         </div><!--/.nav-collapse -->
     </div>
 </nav>

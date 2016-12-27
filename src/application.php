@@ -6,4 +6,7 @@ class Application extends \Slim\App
     public $messages = [];
 
     public $timezone = "UTC";
+
+    /** @var  \PDO */
+    public $connection;
 }
