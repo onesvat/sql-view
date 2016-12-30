@@ -6,8 +6,12 @@ use RedBeanPHP\R;
 
 $app->get('/setting', function (Request $request, Response $response, $args) use ($app) {
 
+    if (!empty($_SESSION['admin'])) {
+        $args['connections'] = R::getAll("SELECT * FROM connections");
+    } else {
+        $args['connections'] = R::getAll("SELECT * FROM connections WHERE cnn_user = :cnn_user", ['cnn_user' => $_SESSION['usr_id']]);
 
-    $args['connections'] = R::getAll("SELECT * FROM connections");
+    }
     foreach ($args['connections'] as $key => $database) {
 
         $connection_status = "success";

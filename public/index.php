@@ -41,10 +41,63 @@ require __DIR__ . '/../src/dependencies.php';
 R::setup('mysql:host=' . $_ENV['DB_HOST'] . ';port=' . $_ENV['DB_PORT'] . ';dbname=' . $_ENV['DB_DATABASE'], $_ENV['DB_USERNAME'], $_ENV['DB_PASSWORD'], true);
 
 // User Auth
+
+
+$admin_auth = function (Request $request, Response $response, $next) use ($app) {
+
+    // Check login
+    if (!array_key_exists('admin', $_SESSION) || $_SESSION['admin'] != true) {
+        return $response->withRedirect("/login");
+    }
+
+    // Check user
+    $user = R::getRow("SELECT * FROM users WHERE usr_id = :usr_id AND usr_type = 'admin'", ['usr_id' => $_SESSION['usr_id']]);
+
+    if (!$user) {
+        return $response->withRedirect("/login?url=" . $_SERVER['REQUEST_URI']);
+    }
+    // Fill user fields
+    $app->extra['user'] = $user;
+
+
+    // Fill connections
+    $active_connection = R::getRow("SELECT * FROM connections WHERE cnn_user = :cnn_user AND cnn_status = 'active'", ['cnn_user' => $user['usr_id']]);
+    $all_connections = R::getAll("SELECT * FROM connections WHERE cnn_user = :cnn_user", ['cnn_user' => $user['usr_id']]);
+
+    $active_connection['connection'] = json_decode($active_connection['cnn_connection'], true);
+
+    $app->extra['all_connections'] = $all_connections;
+    $app->extra['active_connection'] = $active_connection;
+
+    // Get Flash Messages
+    $app->extra['messages'] = $this->flash->getMessages();
+
+    if (!empty($active_connection['connection']['cnn_port'])) {
+        $active_connection['connection']['cnn_host'] = $active_connection['connection']['cnn_host'] . ':' . $active_connection['connection']['cnn_port'];
+    }
+    try {
+        $app->connection = new PDO(
+            "mysql:host=" . $active_connection['connection']['cnn_host'] . ";dbname=" . $active_connection['connection']['cnn_database'],
+            $active_connection['connection']['cnn_username'],
+            $active_connection['connection']['cnn_password'],
+            [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
+            ]
+        );
+    } catch (Exception $e) {
+        $app->extra['connection_error'] = "true";
+    }
+
+    $app->extra['active_connection'] = $active_connection;
+    return $next($request, $response);
+};
+
+
 $user_auth = function (Request $request, Response $response, $next) use ($app) {
 
     // Check login
-    if (!array_key_exists('login', $_SESSION) || $_SESSION['login'] != true) {
+    if (empty($_SESSION['usr_id'])) {
         return $response->withRedirect("/login");
     }
 
@@ -87,7 +140,7 @@ $user_auth = function (Request $request, Response $response, $next) use ($app) {
         $app->extra['connection_error'] = "true";
     }
 
-    $app->extra['active_connection']['cnn_id'] = $active_connection['cnn_id'];
+    $app->extra['active_connection'] = $active_connection;
     return $next($request, $response);
 };
 

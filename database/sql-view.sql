@@ -43,6 +43,7 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `usr_id` int(11) NOT NULL AUTO_INCREMENT,
   `usr_status` enum('active') COLLATE utf8_unicode_ci NOT NULL,
+  `usr_type` enum('user','admin') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'user',
   `usr_email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `usr_password` char(32) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`usr_id`)
