@@ -31,7 +31,7 @@
                 </div>
             </div>
             <div class="col-lg-10">
-                <div class="row">
+                <div class="row" id="mode_row">
 
 
                     <!-- Nav tabs -->
@@ -49,7 +49,7 @@
                         </div>
                         <div role="tabpanel" class="tab-pane" id="gui">
 
-                            <div class="well" style="margin-top: 8px;">
+                            <div class="well" style="margin-top: 8px;" id="mode-well">
                                 <form class="form-horizontal">
                                     <div class="form-group">
                                         <label for="tables" class="col-sm-2 control-label">Tables</label>
@@ -82,25 +82,7 @@
                                     </div>
 
 
-
-
-
                                 </form>
-
-                                <div>
-                                    <button type="button" class="btn btn-primary" style="margin-left:-14px;" id="run_query">Run
-                                    </button>
-
-                                    <div class="row" style="margin-top:10px;">
-                                        <div class="panel panel-default">
-                                            <div class="panel-body">
-                                                {% for query in queries %}
-                                                    {{ query.que_string }}
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
 
 
                             </div>
@@ -111,13 +93,31 @@
                 </div>
 
             </div>
+        </div>
+        <div class="row">
             <div class="col-lg-10 col-lg-offset-2">
+                <div>
+                    <button type="button" class="btn btn-primary" style="margin-left:-14px;" id="run_query">Run
+                    </button>
 
+                    <div class="row" style="margin-top:10px;">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                {% for query in queries %}
+                                    {{ query.que_string }}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         </div>
 
+
     </div>
+
+</div>
 
 </div>
 <!-- /#wrapper -->
@@ -167,6 +167,15 @@
 <script type="text/javascript">
     $("#tables").select2().on('change', function (evt, data) {
         console.log($(this).val());
+    });
+
+    $(document).ready(function () {
+        $('[data-add=rule]').click(function () {
+            $('#mode_row').height($('#gui').height() + 100);
+            console.log($('#gui').height());
+            console.log($('#mode_row').height());
+
+        });
     });
 
 
