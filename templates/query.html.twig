@@ -37,7 +37,7 @@
                     <!-- Nav tabs -->
                     <ul class="nav nav-tabs" role="tablist">
                         <li role="presentation" class="active"><a href="#sql" aria-controls="sql" role="tab"
-                                                                  data-toggle="tab">SQL Mode</a></li>
+                                                                  data-toggle="tab" id="sql_mode_button">SQL Mode</a></li>
                         <li role="presentation"><a href="#gui" aria-controls="gui" role="tab" data-toggle="tab">GUI
                                 Mode</a></li>
                     </ul>
@@ -176,7 +176,13 @@
             console.log($('#mode_row').height());
 
         });
+
+        $('#sql_mode_button').click(function () {
+            $('#mode_row').height(400);
+        });
+
     });
+
 
 
     $('#builder-basic').queryBuilder({
