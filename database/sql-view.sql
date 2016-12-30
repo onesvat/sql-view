@@ -50,5 +50,17 @@ CREATE TABLE `users` (
   PRIMARY KEY (`usr_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+DROP TABLE IF EXISTS `permissions`;
+CREATE TABLE `permissions` (
+  `prm_id` int(11) NOT NULL AUTO_INCREMENT,
+  `prm_usr_id` int(11) NOT NULL,
+  `prm_connection_id` int(11) NOT NULL,
+  `prm_table_name` varchar(255) NOT NULL,
+  `prm_field_name` varchar(255) NOT NULL,
+  PRIMARY KEY (`prm_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
 
 -- 2016-12-26 15:53:40

@@ -80,62 +80,39 @@
                                             <div id="builder-basic"></div>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <div class="col-sm-offset-2 col-sm-10">
-                                            <div class="checkbox">
-                                                <label>
-                                                    <input type="checkbox"> Remember me
-                                                </label>
+
+
+
+
+
+                                </form>
+
+                                <div>
+                                    <button type="button" class="btn btn-primary" style="margin-left:-14px;" id="run_query">Run
+                                    </button>
+
+                                    <div class="row" style="margin-top:10px;">
+                                        <div class="panel panel-default">
+                                            <div class="panel-body">
+                                                {% for query in queries %}
+                                                    {{ query.que_string }}
+                                                {% endfor %}
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <div class="col-sm-offset-2 col-sm-10">
-                                            <button type="submit" class="btn btn-default">Sign in</button>
-                                        </div>
-                                    </div>
-                                </form>
+                                </div>
+
+
                             </div>
 
                         </div>
                     </div>
 
                 </div>
-                {#<div class="row">#}
-                {#<div>#}
-                {#<button type="button" class="btn btn-primary" style="margin-left:-14px;" id="run_query">Run#}
-                {#</button>#}
-
-                {#<div class="row" style="margin-top:10px;">#}
-                {#<div class="panel panel-default">#}
-                {#<div class="panel-body">#}
-                {#{% for query in queries %}#}
-                {#{{ query.que_string }}#}
-                {#{% endfor %}#}
-                {#</div>#}
-                {#</div>#}
-                {#</div>#}
-                {#</div>#}
-                {#</div>#}
 
             </div>
             <div class="col-lg-10 col-lg-offset-2">
-                <div class="row">
-                    <div>
-                        <button type="button" class="btn btn-primary" style="margin-left:-14px;" id="run_query">Run
-                        </button>
 
-                        <div class="row" style="margin-top:10px;">
-                            <div class="panel panel-default">
-                                <div class="panel-body">
-                                    {% for query in queries %}
-                                        {{ query.que_string }}
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
             </div>
         </div>
