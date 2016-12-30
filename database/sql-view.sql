@@ -21,6 +21,7 @@ CREATE TABLE `connections` (
   `cnn_user` int(11) NOT NULL,
   `cnn_name` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
   `cnn_type` enum('mysql','postgresql') COLLATE utf8_unicode_ci NOT NULL,
+  `cnn_status` enum('active','passive') COLLATE utf8_unicode_ci NOT NULL,
   `cnn_connection` text COLLATE utf8_unicode_ci NOT NULL,
   `cnn_access_date` timestamp NULL DEFAULT NULL,
   `cnn_created_date` timestamp NOT NULL,
