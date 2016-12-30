@@ -52,12 +52,13 @@
                                                     <td>{{ connection.cnn_name }}</td>
                                                     <td>{{ connection.conn.cnn_host }}</td>
                                                     <td>
-                                                        <a href="/setting/connection/edit/{{ connection.cnn_id }}"
-                                                           class="btn btn-xs btn-primary">Edit</a>
-                                                        <a href="/query/{{ connection.cnn_id }}"
-                                                           class="btn btn-xs btn-primary">Query</a>
-                                                        <a href="/setting/connection/remove/{{ connection.cnn_id }}"
-                                                           class="btn btn-xs btn-danger">Remove</a>
+
+                                                        <a href="/setting/connection/give_permission/connection/{{ connection.cnn_id }}"
+                                                           class="btn btn-xs btn-primary">Give Permissions</a>
+
+                                                        <a href="/setting/connection/remove_permission/{{ connection.cnn_id }}"
+                                                           class="btn btn-xs btn-primary">Remove Permissions</a>
+
 
                                                     </td>
                                                 </tr>

@@ -52,11 +52,15 @@
                                                     <td>{{ connection.cnn_name }}</td>
                                                     <td>{{ connection.conn.cnn_host }}</td>
                                                     <td>
-                                                        <a href="/setting/connection/give_permission/{{ connection.cnn_id }}"
-                                                           class="btn btn-xs btn-primary">Give Permissions</a>
+                                                        {% if connection.give_permission_button == "enabled" %}
+                                                            <a href="/users/connection/give_permission/{{ user.usr_id }}/{{ connection.cnn_id }}"
+                                                               class="btn btn-xs btn-primary">Give Permissions</a>
+                                                        {% endif %}
 
-                                                        <a href="/setting/connection/remove_permission/{{ connection.cnn_id }}"
+                                                        {% if connection.give_permission_button == "customized" or connection.give_permission_button == "disabled" %}
+                                                        <a href="/users/connection/remove_permission/{{ user.usr_id }}/{{ connection.cnn_id }}"
                                                            class="btn btn-xs btn-primary">Remove Permissions</a>
+                                                        {% endif %}
 
                                                         <a href="/setting/connection/edit/{{ connection.cnn_id }}"
                                                            class="btn btn-xs btn-primary">Edit</a>
