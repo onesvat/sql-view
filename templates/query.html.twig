@@ -42,14 +42,14 @@
             </div>
 
             <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-                <button type="button" class="btn btn-primary" style="margin-left:-14px;">Run</button>
+                <button type="button" class="btn btn-primary" style="margin-left:-14px;" id="run_query">Run</button>
 
                 <div class="row" style="margin-top:10px;">
 
                     <div class="panel panel-default">
                         <div class="panel-body">
                             {% for query in queries %}
-                            {{ query.que_string }}
+                                {{ query.que_string }}
                             {% endfor %}
                         </div>
                     </div>
@@ -77,6 +77,25 @@
     $('#tree').on('nodeSelected', function (event, data) {
         editor.insert(data.column_name)
     });
+
+    $('#run_query').click(function () {
+
+        var formData = {query: editor.getValue()};
+
+        $.ajax({
+            url: "/query/run/ajax",
+            type: "POST",
+            data: formData,
+            success: function (data, textStatus, jqXHR) {
+//                var data = $.parseJSON(json);
+
+            }
+        });
+
+
+    });
+
+
 </script>
 
 <script>

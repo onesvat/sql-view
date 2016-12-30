@@ -87,7 +87,7 @@ $user_auth = function (Request $request, Response $response, $next) use ($app) {
         $app->extra['connection_error'] = "true";
     }
 
-
+    $app->extra['active_connection']['cnn_id'] = $active_connection['cnn_id'];
     return $next($request, $response);
 };
 

@@ -138,7 +138,7 @@
 
     $('#check_button').click(function (e) {
         $('#check_status_success').hide();
-        $('#check_status_success').hide();
+        $('#check_status_error').hide();
         e.preventDefault();
         var formData = $('#connection_form').serialize();
         $.ajax({

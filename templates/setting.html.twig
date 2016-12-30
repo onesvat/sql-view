@@ -41,11 +41,20 @@
                                         </thead>
                                         <tbody>
                                         {% for connection in connections %}
-                                            <tr {% if connection.cnn_status == "active" %}style="background-color: #4cae4c"{% endif %}>
+                                            <tr>
                                                 <td>{{ connection.cnn_name }}</td>
                                                 <td>{{ connection.conn.cnn_host }}</td>
                                                 <td>
-                                                    {{ connection.connection_status }}
+                                                    {% if connection.connection_status == "error" %}
+                                                        <span class="label label-danger">Error</span>
+                                                    {% elseif  connection.connection_status == "success" %}
+                                                        <span class="label label-success">Success</span>
+                                                    {% endif %}
+                                                    &nbsp;
+
+
+                                                    {% if connection.cnn_status == "active" %}<span
+                                                            class="label label-success">Active</span>{% endif %}
                                                 </td>
                                                 <td>
                                                     <a href="/setting/connection/edit/{{ connection.cnn_id }}"
