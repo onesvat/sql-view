@@ -40,9 +40,7 @@ require __DIR__ . '/../src/dependencies.php';
 // Add database
 R::setup('mysql:host=' . $_ENV['DB_HOST'] . ';port=' . $_ENV['DB_PORT'] . ';dbname=' . $_ENV['DB_DATABASE'], $_ENV['DB_USERNAME'], $_ENV['DB_PASSWORD'], true);
 
-// User Auth
-
-
+// Admin Auth
 $admin_auth = function (Request $request, Response $response, $next) use ($app) {
 
     // Check login
@@ -94,7 +92,7 @@ $admin_auth = function (Request $request, Response $response, $next) use ($app) 
     return $next($request, $response);
 };
 
-
+// User Auth
 $user_auth = function (Request $request, Response $response, $next) use ($app) {
 
     // Check login
@@ -144,6 +142,10 @@ $user_auth = function (Request $request, Response $response, $next) use ($app) {
     $app->extra['active_connection'] = $active_connection;
     return $next($request, $response);
 };
+
+// Add models
+require __DIR__ . '/../src/Query.php';
+
 // Add routes
 require __DIR__ . '/../src/routes/home_route.php';
 require __DIR__ . '/../src/routes/dashboard_route.php';

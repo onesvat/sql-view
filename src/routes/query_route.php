@@ -54,13 +54,11 @@ $app->get('/query/cached', function (Request $request, Response $response, $args
 
 $app->post('/query/run/ajax', function (Request $request, Response $response, $args) use ($app) {
 
-    $query = $request->getParam('query');
+    $query = new Query($request->getParam('query'), $app->connection);
 
-    R::exec("INSERT INTO queries() WHERE cnn_user = :cnn_user AND cnn_id = :cnn_id", ['cnn_user' => $_SESSION['usr_id'], 'cnn_id' => $app->extra['active_connection']['cnn_id']]);
+    $result = $query->getArray();
 
-    $app->connection->exec($query) or die(print_r($app->connection->errorInfo(), true));
-
-
+    return $response->withJson($result, 200);
 })->add($user_auth);
 
 

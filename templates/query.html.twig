@@ -31,86 +31,95 @@
                 </div>
             </div>
             <div class="col-lg-10">
-                <div class="row" id="mode_row">
+                <div class="row">
 
+                    <div class="col-lg-12" style="padding: 0px;">
+                        <!-- Nav tabs -->
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active"><a href="#sql" aria-controls="sql" role="tab"
+                                                                      data-toggle="tab" id="sql_mode_button">SQL
+                                    Mode</a>
+                            </li>
+                            <li role="presentation"><a href="#gui" aria-controls="gui" role="tab" data-toggle="tab">GUI
+                                    Mode</a></li>
+                        </ul>
 
-                    <!-- Nav tabs -->
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li role="presentation" class="active"><a href="#sql" aria-controls="sql" role="tab"
-                                                                  data-toggle="tab" id="sql_mode_button">SQL Mode</a></li>
-                        <li role="presentation"><a href="#gui" aria-controls="gui" role="tab" data-toggle="tab">GUI
-                                Mode</a></li>
-                    </ul>
+                        <!-- Tab panes -->
+                        <div class="tab-content" style="height: 430px;">
+                            <div role="tabpanel" class="tab-pane active" id="sql">
+                                <pre id="editor" style="height: 400px;">SELECT * FROM users;</pre>
+                            </div>
+                            <div role="tabpanel" class="tab-pane" id="gui">
+                                <div class="well" style="margin: 0;height: 400px;overflow-y: auto;width: 100%;">
+                                    <form class="form-horizontal">
+                                        <div class="form-group">
+                                            <label for="tables" class="col-sm-2 control-label">Tables</label>
 
-                    <!-- Tab panes -->
-                    <div class="tab-content" style="height: 400px;">
-                        <div role="tabpanel" class="tab-pane active" id="sql">
-                            <pre id="editor" style="height: 300px;"></pre>
-                        </div>
-                        <div role="tabpanel" class="tab-pane" id="gui">
-
-                            <div class="well" style="margin-top: 8px;" id="mode-well">
-                                <form class="form-horizontal">
-                                    <div class="form-group">
-                                        <label for="tables" class="col-sm-2 control-label">Tables</label>
-
-                                        <div class="col-sm-10">
-                                            <select class="select2 form-control" multiple="multiple" name="tables"
-                                                    id="tables" style="width: 100%">
-                                                {% for table in tables %}
-                                                    <option value="{{ table.table_name }}">{{ table.table_name }}</option>
-                                                {% endfor %}
-                                            </select>
+                                            <div class="col-sm-10">
+                                                <select class="select2 form-control" multiple="multiple" name="tables"
+                                                        id="tables" style="width: 100%">
+                                                    {% for table in tables %}
+                                                        <option value="{{ table.table_name }}">{{ table.table_name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="fields" class="col-sm-2 control-label">Fields</label>
+                                        <div class="form-group">
+                                            <label for="fields" class="col-sm-2 control-label">Fields</label>
 
-                                        <div class="col-sm-10">
-                                            <select class="select2 form-control" multiple="multiple" name="fields"
-                                                    id="fields" style="width: 100%">
-
-                                            </select>
+                                            <div class="col-sm-10">
+                                                <select class="select2 form-control" multiple="multiple" name="fields"
+                                                        id="fields" style="width: 100%">
+                                                    {% for table in tables %}
+                                                        <option value="{{ table.table_name }}">{{ table.table_name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="inputPassword3" class="col-sm-2 control-label">Criterias</label>
+                                        <div class="form-group">
+                                            <label for="inputPassword3" class="col-sm-2 control-label">Criterias</label>
 
-                                        <div class="col-sm-10">
-                                            <div id="builder-basic"></div>
+                                            <div class="col-sm-10">
+                                                <div id="builder-basic"></div>
+                                            </div>
                                         </div>
-                                    </div>
 
 
-                                </form>
+                                    </form>
 
+
+                                </div>
 
                             </div>
+                        </div>
+
+                    </div>
+                    <div class="col-lg-12" style="padding: 0px;">
+                        <div class="alert alert-danger" id="error_holder" style="display: none;">
+                            <span id="error_message"></span>
+                        </div>
+
+                        <div style="background-color:white; padding: 10px; height: 54px;line-height: 34px;">
+
+                            <span id="timer">Ready</span>
+
+                            <button type="button" class="btn btn-primary pull-right" id="run_query">
+                                Run Query
+                            </button>
 
                         </div>
                     </div>
-
-                </div>
-
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-10 col-lg-offset-2">
-                <div>
-                    <button type="button" class="btn btn-primary" style="margin-left:-14px;" id="run_query">Run
-                    </button>
-
-                    <div class="row" style="margin-top:10px;">
+                    <div class="col-lg-12" style="padding: 40px 0 0 0; display: none;" id="result-panel">
                         <div class="panel panel-default">
+                            <div class="panel-heading">Results</div>
                             <div class="panel-body">
-                                {% for query in queries %}
-                                    {{ query.que_string }}
-                                {% endfor %}
+                                <div id="table_holder" class="table-responsive">
+                                </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
-
             </div>
         </div>
 
@@ -132,6 +141,25 @@
 
     $('#run_query').click(function () {
 
+        $("#error_holder").hide();
+        $("#result-panel").hide();
+
+        $("#timer").html("");
+
+        var timer = new Timer();
+        timer.start({
+            precision: 'secondTenths', callback: function (values) {
+                $('#timer').html(values.toString(['seconds', 'secondTenths']));
+            }
+        });
+        timer.addEventListener('secondsUpdated', function () {
+            $('#timer').html(timer.getTimeValues().toString(['seconds', 'secondTenths']));
+        });
+
+        var $btn = $(this);
+        $btn.button('loading');
+
+
         var formData = {query: editor.getValue()};
 
         $.ajax({
@@ -139,8 +167,39 @@
             type: "POST",
             data: formData,
             success: function (data, textStatus, jqXHR) {
-//                var data = $.parseJSON(json);
+                var seconds = timer.getTimeValues().seconds;
+                var secondTenths = timer.getTimeValues().secondTenths;
+                timer.stop();
+                $btn.button('reset');
 
+                if (data.status) {
+
+
+                    $('#timer').html("Query successfully completed. (" + seconds + "." + secondTenths + "s elapsed, " + data.rows.length + " rows are returned)");
+
+                    if (data.columns.length > 0) {
+
+                        $("#result-panel").show();
+                        var thead_str = data.columns.join("</th><th>");
+                        var tfoot_str = data.columns.join("</td><td>");
+                        $("#table_holder").html('<table class="table table-project" id="report-general-table" style="width: 100%"><thead><tr><th>' + thead_str + '</th></tr></thead><tfoot><tr><td>' + tfoot_str + '</td></tr></tfoot><tbody></tbody></table>');
+
+                        var reportTable = $('#report-general-table').DataTable({
+                            dom: "<'row'><'row'<'col-sm-12'tr>><'row'<'col-sm-5'i><'col-sm-7'p>>",
+                            pageLength: 200
+                        });
+
+                        reportTable.rows.add(data.rows).draw();
+
+                    }
+
+
+                } else {
+                    $('#timer').html("Query has failed. (" + seconds + "." + secondTenths + "s elapsed)");
+
+                    $("#error_holder").show();
+                    $("#error_message").html(data.error);
+                }
             }
         });
 
@@ -168,21 +227,9 @@
     $("#tables").select2().on('change', function (evt, data) {
         console.log($(this).val());
     });
-
-    $(document).ready(function () {
-        $('[data-add=rule]').click(function () {
-            $('#mode_row').height($('#gui').height() + 100);
-            console.log($('#gui').height());
-            console.log($('#mode_row').height());
-
-        });
-
-        $('#sql_mode_button').click(function () {
-            $('#mode_row').height(400);
-        });
-
+    $("#fields").select2().on('change', function (evt, data) {
+        console.log($(this).val());
     });
-
 
 
     $('#builder-basic').queryBuilder({
