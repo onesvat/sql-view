@@ -6,7 +6,7 @@
     <style type="text/css" media="screen">
         #editor {
             position: absolute;
-            top: 0;
+            top: 50px;
             right: 0;
             bottom: 0;
             left: 0;
@@ -25,40 +25,122 @@
     <div class="container">
 
         <div class="row">
-            <div class="col-lg-4">
+            <div class="col-lg-2">
                 <div id="tree">
 
                 </div>
             </div>
-            <div class="col-lg-8">
-                <pre id="editor" style="height: 120px;">SELECT * FROM users;</pre>
+            <div class="col-lg-10">
+                <div class="row">
+
+
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active"><a href="#sql" aria-controls="sql" role="tab"
+                                                                  data-toggle="tab">SQL Mode</a></li>
+                        <li role="presentation"><a href="#gui" aria-controls="gui" role="tab" data-toggle="tab">GUI
+                                Mode</a></li>
+                    </ul>
+
+                    <!-- Tab panes -->
+                    <div class="tab-content" style="height: 400px;">
+                        <div role="tabpanel" class="tab-pane active" id="sql">
+                            <pre id="editor" style="height: 300px;"></pre>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="gui">
+
+                            <div class="well" style="margin-top: 8px;">
+                                <form class="form-horizontal">
+                                    <div class="form-group">
+                                        <label for="tables" class="col-sm-2 control-label">Tables</label>
+
+                                        <div class="col-sm-10">
+                                            <select class="select2 form-control" multiple="multiple" name="tables"
+                                                    id="tables" style="width: 100%">
+                                                {% for table in tables %}
+                                                    <option value="{{ table.table_name }}">{{ table.table_name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="fields" class="col-sm-2 control-label">Fields</label>
+
+                                        <div class="col-sm-10">
+                                            <select class="select2 form-control" multiple="multiple" name="fields"
+                                                    id="fields" style="width: 100%">
+
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="inputPassword3" class="col-sm-2 control-label">Criterias</label>
+
+                                        <div class="col-sm-10">
+                                            <div id="builder-basic"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-2 col-sm-10">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox"> Remember me
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-2 col-sm-10">
+                                            <button type="submit" class="btn btn-default">Sign in</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                {#<div class="row">#}
+                {#<div>#}
+                {#<button type="button" class="btn btn-primary" style="margin-left:-14px;" id="run_query">Run#}
+                {#</button>#}
+
+                {#<div class="row" style="margin-top:10px;">#}
+                {#<div class="panel panel-default">#}
+                {#<div class="panel-body">#}
+                {#{% for query in queries %}#}
+                {#{{ query.que_string }}#}
+                {#{% endfor %}#}
+                {#</div>#}
+                {#</div>#}
+                {#</div>#}
+                {#</div>#}
+                {#</div>#}
 
             </div>
-        </div>
-        <div class="row" style="margin-top:120px;">
+            <div class="col-lg-10 col-lg-offset-2">
+                <div class="row">
+                    <div>
+                        <button type="button" class="btn btn-primary" style="margin-left:-14px;" id="run_query">Run
+                        </button>
 
-            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-
-            </div>
-
-            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-                <button type="button" class="btn btn-primary" style="margin-left:-14px;" id="run_query">Run</button>
-
-                <div class="row" style="margin-top:10px;">
-
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            {% for query in queries %}
-                                {{ query.que_string }}
-                            {% endfor %}
+                        <div class="row" style="margin-top:10px;">
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    {% for query in queries %}
+                                        {{ query.que_string }}
+                                    {% endfor %}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
 
-
-    </div><!-- /.container -->
+    </div>
 
 </div>
 <!-- /#wrapper -->
@@ -67,14 +149,7 @@
 
 
 <script>
-    function getTree() {
-        // Some logic to retrieve, or generate tree structure
-        return JSON.parse('{{ tree|raw }}');
-    }
-
-    $('#tree').treeview({data: getTree()});
-
-    $('#tree').on('nodeSelected', function (event, data) {
+    $('#tree').treeview({data: JSON.parse('{{ tree|raw }}')}).on('nodeSelected', function (event, data) {
         editor.insert(data.column_name)
     });
 
@@ -110,6 +185,65 @@
     });
     editor.setFontSize(14);
     editor.$blockScrolling = Infinity;
+</script>
+
+<script type="text/javascript">
+    $("#tables").select2().on('change', function (evt, data) {
+        console.log($(this).val());
+    });
+
+
+    $('#builder-basic').queryBuilder({
+        plugins: ['bt-tooltip-errors'],
+
+        filters: [{
+            id: 'name',
+            label: 'Name',
+            type: 'string'
+        }, {
+            id: 'category',
+            label: 'Category',
+            type: 'integer',
+            input: 'select',
+            values: {
+                1: 'Books',
+                2: 'Movies',
+                3: 'Music',
+                4: 'Tools',
+                5: 'Goodies',
+                6: 'Clothes'
+            },
+            operators: ['equal', 'not_equal', 'in', 'not_in', 'is_null', 'is_not_null']
+        }, {
+            id: 'in_stock',
+            label: 'In stock',
+            type: 'integer',
+            input: 'radio',
+            values: {
+                1: 'Yes',
+                0: 'No'
+            },
+            operators: ['equal']
+        }, {
+            id: 'price',
+            label: 'Price',
+            type: 'double',
+            validation: {
+                min: 0,
+                step: 0.01
+            }
+        }, {
+            id: 'id',
+            label: 'Identifier',
+            type: 'string',
+            placeholder: '____-____-____',
+            operators: ['equal', 'not_equal'],
+            validation: {
+                format: /^.{4}-.{4}-.{4}$/
+            }
+        }]
+    });
+
 </script>
 
 </body>

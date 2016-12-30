@@ -7,8 +7,8 @@ use RedBeanPHP\R;
 $app->get('/query', function (Request $request, Response $response, $args) use ($app) {
 
     try {
-        $stmt = $app->connection->prepare("SELECT TABLE_NAME table_name, COLUMN_NAME column_name, COLUMN_TYPE column_type, DATA_TYPE column_data_type FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='adjo-panel'");
-        $stmt->execute();
+        $stmt = $app->connection->prepare("SELECT TABLE_NAME table_name, COLUMN_NAME column_name, COLUMN_TYPE column_type, DATA_TYPE column_data_type FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=:table_schema");
+        $stmt->execute(['table_schema' => $app->extra['active_connection']['connection']['cnn_database']]);
         $fields = $stmt->fetchAll();
 
         $tables = [];
@@ -35,6 +35,8 @@ $app->get('/query', function (Request $request, Response $response, $args) use (
 
     } catch (Exception $e) {
     }
+
+
     $args['tables'] = $tables;
     $args['tree'] = json_encode($tree);
     $args['queries'] = R::getAll("SELECT * FROM queries");
