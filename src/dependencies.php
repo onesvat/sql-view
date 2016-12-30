@@ -13,6 +13,7 @@ $container['view'] = function ($container) {
 
     $view = new \Slim\Views\Twig($settings['template_path'], [
         //'cache' => $settings['cache_path']
+        'debug' => true,
     ]);
 
     $view->addExtension(new \Slim\Views\TwigExtension(
@@ -21,6 +22,7 @@ $container['view'] = function ($container) {
     ));
 
     $view->addExtension(new Twig_Extensions_Extension_I18n());
+    $view->addExtension(new Twig_Extension_Debug());
 
     $view->getEnvironment()->getExtension('core')->setTimezone($_ENV['APP_TIMEZONE']);
 
