@@ -53,22 +53,14 @@
                                                     <td>{{ connection.conn.cnn_host }}</td>
                                                     <td>
                                                         {% if connection.give_permission_button == "enabled" %}
-                                                            <a href="/users/connection/give_permission/{{ user.usr_id }}/{{ connection.cnn_id }}"
+                                                            <a href="/users/connection/give_permission/{{ connection.cnn_user }}/{{ connection.cnn_id }}"
                                                                class="btn btn-xs btn-primary">Give Permissions</a>
                                                         {% endif %}
 
                                                         {% if connection.give_permission_button == "customized" or connection.give_permission_button == "disabled" %}
-                                                        <a href="/users/connection/remove_permission/{{ user.usr_id }}/{{ connection.cnn_id }}"
+                                                        <a href="/users/connection/remove_permission/{{ connection.cnn_user }}/{{ connection.cnn_id }}"
                                                            class="btn btn-xs btn-primary">Remove Permissions</a>
                                                         {% endif %}
-
-                                                        <a href="/setting/connection/edit/{{ connection.cnn_id }}"
-                                                           class="btn btn-xs btn-primary">Edit</a>
-                                                        <a href="/query/{{ connection.cnn_id }}"
-                                                           class="btn btn-xs btn-primary">Query</a>
-                                                        <a href="/setting/connection/remove/{{ connection.cnn_id }}"
-                                                           class="btn btn-xs btn-danger">Remove</a>
-
                                                     </td>
                                                 </tr>
                                             {% endfor %}

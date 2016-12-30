@@ -15,7 +15,6 @@ $app->get('/users', function (Request $request, Response $response, $args) use (
 $app->get('/users/permissions/connections/{usr_id}', function (Request $request, Response $response, $args) use ($app) {
 
     $args['connections'] = R::getAll("SELECT * FROM connections LEFT JOIN permissions ON cnn_user = prm_usr_id WHERE cnn_user = :cnn_user", ['cnn_user' => $args['usr_id']]);
-
     foreach ($args['connections'] as $key => $connection) {
         if ((!empty($connection['prm_table_name'])) || (!empty($connection['field_name']))) {
             $args['connections'][$key]['give_permission_button'] = 'customized';
