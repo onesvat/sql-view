@@ -89,6 +89,7 @@ $admin_auth = function (Request $request, Response $response, $next) use ($app) 
         $app->extra['connection_error'] = "true";
     }
 
+
     $app->extra['active_connection'] = $active_connection;
     return $next($request, $response);
 };
@@ -143,11 +144,11 @@ $user_auth = function (Request $request, Response $response, $next) use ($app) {
     $app->extra['active_connection'] = $active_connection;
     return $next($request, $response);
 };
-
 // Add routes
 require __DIR__ . '/../src/routes/home_route.php';
 require __DIR__ . '/../src/routes/dashboard_route.php';
 require __DIR__ . '/../src/routes/query_route.php';
 require __DIR__ . '/../src/routes/setting_route.php';
+require __DIR__ . '/../src/routes/users_route.php';
 
 $app->run();
