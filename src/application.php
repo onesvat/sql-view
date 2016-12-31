@@ -7,6 +7,6 @@ class Application extends \Slim\App
 
     public $timezone = "UTC";
 
-    /** @var  \PDO */
+    /** @var  Connection */
     public $connection;
 }

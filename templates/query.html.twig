@@ -108,6 +108,28 @@
                             </button>
 
                         </div>
+
+                        <hr/>
+
+                        <div style="background-color:white; padding: 10px; height: 54px;line-height: 34px;display: none;" id="download-panel">
+
+                            <div class="input-group">
+
+                                <input type="text" class="form-control" id="download_url">
+
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                            aria-haspopup="true" aria-expanded="false"><span id="download_type">CSV</span> <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="#" id="download_csv">CSV</a></li>
+                                        <li><a href="#" id="download_tsv">TSV</a></li>
+                                        <li><a href="#" id="download_json">JSON</a></li>
+                                    </ul>
+                                    <button type="button" class="btn btn-default">Download</button>
+                                </div><!-- /btn-group -->
+                            </div><!-- /input-group -->
+                        </div>
                     </div>
                     <div class="col-lg-12" style="padding: 40px 0 0 0; display: none;" id="result-panel">
                         <div class="panel panel-default">
@@ -135,6 +157,9 @@
 
 
 <script>
+
+    var query_hash = "";
+    var domain = "http://sql-view.app/";
     $('#tree').treeview({data: JSON.parse('{{ tree|raw }}')}).on('nodeSelected', function (event, data) {
         editor.insert(data.column_name)
     });
@@ -180,6 +205,11 @@
                     if (data.columns.length > 0) {
 
                         $("#result-panel").show();
+                        $("#download-panel").show();
+
+                        query_hash = data.query_hash;
+
+                        $("#download_url").val(domain + "query/download/" + query_hash + ".csv");
                         var thead_str = data.columns.join("</th><th>");
                         var tfoot_str = data.columns.join("</td><td>");
                         $("#table_holder").html('<table class="table table-project" id="report-general-table" style="width: 100%"><thead><tr><th>' + thead_str + '</th></tr></thead><tfoot><tr><td>' + tfoot_str + '</td></tr></tfoot><tbody></tbody></table>');
@@ -204,6 +234,34 @@
         });
 
 
+    });
+
+    $("#download_csv").click(function () {
+        $("#download_url").val(domain + "query/download/" + query_hash + ".csv");
+        $("#download_type").html("CSV");
+    });
+
+    $("#download_tsv").click(function () {
+        $("#download_url").val(domain + "query/download/" + query_hash + ".tsv");
+        $("#download_type").html("TSV");
+    });
+
+    $("#download_json").click(function () {
+        $("#download_url").val(domain + "query/download/" + query_hash + ".json");
+        $("#download_type").html("JSON");
+    });
+
+
+    $(".code_area").focus(function () {
+        var $this = $(this);
+        $this.select();
+
+        // Work around Chrome's little problem
+        $this.mouseup(function () {
+            // Prevent further mouseup intervention
+            $this.unbind("mouseup");
+            return false;
+        });
     });
 
 

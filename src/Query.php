@@ -15,17 +15,22 @@ class Query
     /**
      * @var PDO
      */
-    private $connection;
+    private $pdo;
 
     private $connection_id;
 
-    public function __construct($query, $connection, $connection_id)
+    /**
+     * Query constructor.
+     * @param $query
+     * @param Connection $connection
+     */
+    public function __construct($query, $connection)
     {
         $this->query = $query;
         $this->query_hash = md5($query);
 
-        $this->connection = $connection;
-        $this->connection_id = $connection_id;
+        $this->pdo = $connection->getConnection();
+        $this->connection_id = $connection->getId();
     }
 
     public function getArray()
@@ -38,7 +43,7 @@ class Query
 
         if (!$data) {
             try {
-                $stmt = $this->connection->prepare($this->query);
+                $stmt = $this->pdo->prepare($this->query);
                 $stmt->execute();
                 $rows = $stmt->fetchAll();
                 $columns = [];
@@ -58,6 +63,7 @@ class Query
 
         return [
             'status' => $status,
+            'query_hash' => $this->query_hash,
             'timestamp' => $data['timestamp'],
             'time-elapsed' => microtime(true) - $start,
             'rows' => $data['rows'],
