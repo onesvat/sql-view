@@ -105,6 +105,19 @@ $app->get('/users/tables/give_permission/{usr_id}/{connection_id}/{table_name}',
 })->add($admin_auth);
 
 
+
+$app->get('/users/tables/remove_permission/{usr_id}/{connection_id}/{table_name}', function (Request $request, Response $response, $args) use ($app) {
+
+    R::debug();
+
+
+    R::exec("DELETE FROM permissions WHERE prm_connection_id= :prm_connection_id AND prm_usr_id= :prm_usr_id AND prm_table_name= :prm_table_name", ['prm_connection_id' => $args['connection_id'], 'prm_usr_id' => $args['usr_id'], 'prm_table_name' => $args['table_name']]);
+
+
+    return $response->withRedirect('/users/permissions/tables/' . $args['usr_id'] . '/' . $args['connection_id']);
+})->add($admin_auth);
+
+
 $app->get('/users/permissions/fields/{usr_id}/{connection_id}', function (Request $request, Response $response, $args) use ($app) {
 
     $args['connections'] = R::getAll("SELECT * FROM connections");
