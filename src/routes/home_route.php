@@ -21,7 +21,7 @@ $app->post('/login', function (Request $request, Response $response, $args) use 
     $email = $request->getParam('email');
     $password = $request->getParam('password');
 
-    $user = R::getRow("SELECT * FROM users WHERE usr_status = 'active' AND usr_email = :usr_email AND usr_password = :usr_password", [
+    $user = R::getRow("SELECT * FROM users WHERE usr_email = :usr_email AND usr_password = :usr_password", [
         'usr_email' => $email,
         'usr_password' => md5($password)
     ]);

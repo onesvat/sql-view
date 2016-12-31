@@ -99,4 +99,48 @@ class Connection
         return $this->connection;
     }
 
+    public static function getConnectionsWithPermissions($usr_id)
+    {
+        $connections = [];
+        $permissions = [];
+
+        foreach (R::getAll("SELECT * FROM permissions WHERE prm_usr = :usr_id", ['usr_id' => $usr_id]) as $permission) {
+            $permissions[$permission['prm_connection']] = $permission;
+        }
+
+        foreach (R::getAll("SELECT * FROM connections") as $connection) {
+            if (array_key_exists($connection['cnn_id'], $permissions)) {
+                $connection['permission'] = json_decode($permissions[$connection['cnn_id']]['prm_permission'], true);
+            } else {
+                $connection['permission'] = [];
+            }
+
+            $connections[] = $connections;
+        }
+
+        return $connections;
+    }
+
+    public static function getConnections()
+    {
+        $connections = [];
+        foreach (R::getAll("SELECT * FROM connections") as $connection) {
+            $settings = json_decode($connection['cnn_connection'], true);
+
+            $conn_object = new Connection($connection['cnn_id'], $connection['cnn_type'], [
+                'host' => $settings['cnn_host'],
+                'port' => $settings['cnn_port'],
+                'username' => $settings['cnn_username'],
+                'password' => $settings['cnn_password'],
+                'database' => $settings['cnn_database']
+            ]);
+
+            $connection['fields'] = $conn_object->getFields();
+
+            $connections[] = $connections;
+        }
+
+        return $connections;
+    }
+
 }

@@ -11,10 +11,46 @@ $app->get('/users', function (Request $request, Response $response, $args) use (
     return $this->view->render($response, 'users.html.twig', array_merge($app->extra, $args));
 })->add($user_auth)->add($admin_auth);
 
+$app->get('/users/new', function (Request $request, Response $response, $args) use ($app) {
+
+    return $this->view->render($response, 'users_new.html.twig', array_merge($app->extra, $args));
+})->add($user_auth)->add($admin_auth);
+
+$app->post('/users/new', function (Request $request, Response $response, $args) use ($app) {
+
+    R::exec("INSERT INTO users (usr_type, usr_email, usr_password) VALUES (:usr_type, :usr_email, :usr_password)", [
+        'usr_type' => $request->getParam('usr_type'),
+        'usr_email' => $request->getParam('usr_email'),
+        'usr_password' => md5($request->getParam('password'))
+    ]);
+
+    return $response->withRedirect('/users');
+})->add($user_auth)->add($admin_auth);
+
+$app->get('/users/edit/{usr_id}', function (Request $request, Response $response, $args) use ($app) {
+
+    $args['curr_user'] = R::getRow("SELECT * FROM users WHERE usr_id = :usr_id", ['usr_id' => $args['usr_id']]);
+
+    return $this->view->render($response, 'users_edit.html.twig', array_merge($app->extra, $args));
+})->add($user_auth)->add($admin_auth);
+
+$app->post('/users/edit/{usr_id}', function (Request $request, Response $response, $args) use ($app) {
+
+    R::exec("UPDATE users SET usr_type = :usr_type, usr_email = :usr_email, usr_password = :usr_password WHERE usr_id = :usr_id", [
+        'usr_id' => $args['usr_id'],
+        'usr_type' => $request->getParam('usr_type'),
+        'usr_email' => $request->getParam('usr_email'),
+        'usr_password' => md5($request->getParam('password'))
+    ]);
+
+    return $response->withRedirect('/users');
+})->add($user_auth)->add($admin_auth);
+
 
 $app->get('/users/permissions/connections/{usr_id}', function (Request $request, Response $response, $args) use ($app) {
 
-    $args['connections'] = R::getAll("SELECT * FROM connections LEFT JOIN permissions ON cnn_user = prm_usr_id WHERE cnn_user = :cnn_user", ['cnn_user' => $args['usr_id']]);
+
+
     foreach ($args['connections'] as $key => $connection) {
         if ((!empty($connection['prm_table_name'])) || (!empty($connection['field_name']))) {
             $args['connections'][$key]['give_permission_button'] = 'customized';
