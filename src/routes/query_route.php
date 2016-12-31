@@ -52,12 +52,11 @@ $app->get('/query/cached', function (Request $request, Response $response, $args
 
 });
 
-$app->post('/query/run/ajax', function (Request $request, Response $response, $args) use ($app) {
+$app->post('/query/run', function (Request $request, Response $response, $args) use ($app) {
 
-    $query = new Query($request->getParam('query'), $app->connection);
-
+    $query_string = $request->getParam('query');
+    $query = new Query($query_string, $app->connection, $app->extra['active_connection']['cnn_id']);
     $result = $query->getArray();
-
     return $response->withJson($result, 200);
 })->add($user_auth);
 
