@@ -59,8 +59,9 @@ $admin_auth = function (Request $request, Response $response, $next) use ($app) 
 
 
     // Fill connections
-    $active_connection = R::getRow("SELECT * FROM connections WHERE cnn_user = :cnn_user AND cnn_status = 'active'", ['cnn_user' => $user['usr_id']]);
-    $all_connections = R::getAll("SELECT * FROM connections WHERE cnn_user = :cnn_user", ['cnn_user' => $user['usr_id']]);
+    $active_connection = R::getRow("SELECT * FROM connections INNER JOIN active_connections ON cnn_id = atc_active_cnn_id WHERE atc_usr_id = :usr_id", ['usr_id' => $user['usr_id']]);
+
+    $all_connections = R::getAll("SELECT * FROM connections INNER JOIN permissions ON cnn_id = prm_connection_id WHERE prm_usr_id = :usr_id", ['usr_id' => $user['usr_id']]);
 
     $active_connection['connection'] = json_decode($active_connection['cnn_connection'], true);
 
@@ -111,8 +112,10 @@ $user_auth = function (Request $request, Response $response, $next) use ($app) {
 
 
     // Fill connections
-    $active_connection = R::getRow("SELECT * FROM connections WHERE cnn_user = :cnn_user AND cnn_status = 'active'", ['cnn_user' => $user['usr_id']]);
-    $all_connections = R::getAll("SELECT * FROM connections WHERE cnn_user = :cnn_user", ['cnn_user' => $user['usr_id']]);
+    $active_connection = R::getRow("SELECT * FROM connections INNER JOIN active_connections ON cnn_id = atc_active_cnn_id WHERE atc_usr_id = :usr_id", ['usr_id' => $user['usr_id']]);
+
+    $all_connections = R::getAll("SELECT * FROM connections INNER JOIN permissions ON cnn_id = prm_connection_id WHERE prm_usr_id = :usr_id", ['usr_id' => $user['usr_id']]);
+
 
     $active_connection['connection'] = json_decode($active_connection['cnn_connection'], true);
 
@@ -123,7 +126,7 @@ $user_auth = function (Request $request, Response $response, $next) use ($app) {
     $app->extra['messages'] = $this->flash->getMessages();
 
     try {
-        if ($active_connection['cnn_type'] == "mysql") {
+        if ($app->extra['active_connection'] == "mysql") {
             $app->connection = new PDO(
                 "mysql:host=" . $active_connection['connection']['cnn_host'] . ':' . $active_connection['connection']['cnn_port'] . ";dbname=" . $active_connection['connection']['cnn_database'],
                 $active_connection['connection']['cnn_username'],
@@ -133,7 +136,7 @@ $user_auth = function (Request $request, Response $response, $next) use ($app) {
                     PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
                 ]
             );
-        } else if ($active_connection['cnn_type'] == "postgresql") {
+        } else if ($app->extra['active_connection'] == "postgresql") {
             $app->connection = new PDO(
                 "pgsql:host=" . $active_connection['connection']['cnn_host'] . ";dbname=" . $active_connection['connection']['cnn_database'],
                 $active_connection['connection']['cnn_username'],
@@ -164,7 +167,7 @@ require __DIR__ . '/../src/routes/home_route.php';
 require __DIR__ . '/../src/routes/dashboard_route.php';
 require __DIR__ . '/../src/routes/favorite_route.php';
 require __DIR__ . '/../src/routes/query_route.php';
-require __DIR__ . '/../src/routes/setting_route.php';
+require __DIR__ . '/../src/routes/connections_route.php';
 require __DIR__ . '/../src/routes/users_route.php';
 
 $app->run();

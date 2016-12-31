@@ -4,14 +4,10 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use RedBeanPHP\R;
 
-$app->get('/setting', function (Request $request, Response $response, $args) use ($app) {
+$app->get('/connections', function (Request $request, Response $response, $args) use ($app) {
 
-    if (!empty($_SESSION['admin'])) {
         $args['connections'] = R::getAll("SELECT * FROM connections");
-    } else {
-        $args['connections'] = R::getAll("SELECT * FROM connections WHERE cnn_user = :cnn_user", ['cnn_user' => $_SESSION['usr_id']]);
 
-    }
     foreach ($args['connections'] as $key => $database) {
 
         $connection_status = "success";
@@ -37,14 +33,14 @@ $app->get('/setting', function (Request $request, Response $response, $args) use
 
     }
 
-    return $this->view->render($response, 'setting.html.twig', array_merge($app->extra, $args));
-})->add($user_auth);
+    return $this->view->render($response, 'connections.html.twig', array_merge($app->extra, $args));
+})->add($admin_auth);
 
 
-$app->get('/setting/connection/new', function (Request $request, Response $response, $args) use ($app) {
+$app->get('/connections/new', function (Request $request, Response $response, $args) use ($app) {
 
-    return $this->view->render($response, 'setting_connection_new.html.twig', array_merge($app->extra, $args));
-})->add($user_auth);
+    return $this->view->render($response, 'connections_new.html.twig', array_merge($app->extra, $args));
+})->add($admin_auth);
 
 $app->post('/setting/connection/new', function (Request $request, Response $response, $args) use ($app) {
 
@@ -58,8 +54,7 @@ $app->post('/setting/connection/new', function (Request $request, Response $resp
         ]);
 
 
-    R::exec("INSERT INTO connections (cnn_user, cnn_name, cnn_type, cnn_connection, cnn_created_date, cnn_access_date) VALUES(:cnn_user, :cnn_name, :cnn_type, :cnn_connection, :cnn_created_date, :cnn_access_date)", [
-        'cnn_user' => $_SESSION['usr_id'],
+    R::exec("INSERT INTO connections (cnn_name, cnn_type, cnn_connection, cnn_created_date, cnn_access_date) VALUES(:cnn_name, :cnn_type, :cnn_connection, :cnn_created_date, :cnn_access_date)", [
         'cnn_name' => $request->getParam('cnn_name'),
         'cnn_type' => $request->getParam('cnn_type'),
         'cnn_connection' => $cnn_connection,
@@ -67,17 +62,18 @@ $app->post('/setting/connection/new', function (Request $request, Response $resp
         'cnn_access_date' => null,
     ]);
 
-    return $response->withRedirect('/setting');
-})->add($user_auth);
+    return $response->withRedirect('/connections');
+})->add($admin_auth);
 
-$app->get('/setting/connection/edit/{cnn_id}', function (Request $request, Response $response, $args) use ($app) {
+$app->get('/connections/edit/{cnn_id}', function (Request $request, Response $response, $args) use ($app) {
 
     $args = R::getRow("SELECT * FROM connections WHERE cnn_id = :cnn_id", ['cnn_id' => $args['cnn_id']]);
     $args = array_merge(json_decode($args['cnn_connection'], true), $args);
-    return $this->view->render($response, 'setting_connection_edit.html.twig', array_merge($app->extra, $args));
-})->add($user_auth);
+    return $this->view->render($response, 'connections_edit.html.twig', array_merge($app->extra, $args));
 
-$app->post('/setting/connection/edit/{cnn_id}', function (Request $request, Response $response, $args) use ($app) {
+})->add($admin_auth);
+
+$app->post('/connections/edit/{cnn_id}', function (Request $request, Response $response, $args) use ($app) {
 
 
     $cnn_connection = json_encode(
@@ -100,17 +96,17 @@ $app->post('/setting/connection/edit/{cnn_id}', function (Request $request, Resp
         'cnn_id' => $args['cnn_id'],
     ]);
 
-    return $response->withRedirect("/setting");
+    return $response->withRedirect("/connections");
 
-})->add($user_auth);
+})->add($admin_auth);
 
-$app->get('/setting/connection/remove/{cnn_id}', function (Request $request, Response $response, $args) use ($app) {
+$app->get('/connections/remove/{cnn_id}', function (Request $request, Response $response, $args) use ($app) {
 
     R::exec("DELETE FROM connections WHERE cnn_id = :cnn_id", ['cnn_id' => $args['cnn_id']]);
     R::exec("UPDATE connections SET cnn_status = 'active' WHERE cnn_user = :cnn_user LIMIT 1", ['cnn_user' => $_SESSION['usr_id']]);
-    return $response->withRedirect("/setting");
+    return $response->withRedirect("/connections");
 
-})->add($user_auth);
+})->add($admin_auth);
 
 $app->get('/setting/connection/change/{connection_id}', function (Request $request, Response $response, $args) use ($app) {
 
@@ -119,10 +115,10 @@ $app->get('/setting/connection/change/{connection_id}', function (Request $reque
 
     return $response->withRedirect("/dashboard");
 
-})->add($user_auth);
+})->add($admin_auth);
 
 
-$app->post('/setting/connection/check/ajax', function (Request $request, Response $response, $args) use ($app) {
+$app->post('/connections/check/ajax', function (Request $request, Response $response, $args) use ($app) {
 
     if ($request->getParam('cnn_type') == "mysql") {
         try {
@@ -145,7 +141,7 @@ $app->post('/setting/connection/check/ajax', function (Request $request, Respons
     die;
 
 
-})->add($user_auth);
+})->add($admin_auth);
 
 
 

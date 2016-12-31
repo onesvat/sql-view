@@ -20,7 +20,7 @@
                     <div class="panel-heading">
                         Connections
                         <div class="pull-right">
-                            <a href="/setting/connection/new" type="button" class="btn btn-xs btn-primary"
+                            <a href="/connections/new" type="button" class="btn btn-xs btn-primary"
                                aria-label="Left Align">
                                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New Connection
                             </a>
@@ -57,11 +57,11 @@
                                                             class="label label-success">Active</span>{% endif %}
                                                 </td>
                                                 <td>
-                                                    <a href="/setting/connection/edit/{{ connection.cnn_id }}"
+                                                    <a href="/connections/edit/{{ connection.cnn_id }}"
                                                        class="btn btn-xs btn-primary">Edit</a>
                                                     <a href="/query/{{ connection.cnn_id }}"
                                                        class="btn btn-xs btn-primary">Query</a>
-                                                    <a href="/setting/connection/remove/{{ connection.cnn_id }}"
+                                                    <a href="/connections/remove/{{ connection.cnn_id }}"
                                                        class="btn btn-xs btn-danger">Remove</a>
 
                                                 </td>

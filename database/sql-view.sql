@@ -18,7 +18,6 @@ CREATE TABLE `caches` (
 DROP TABLE IF EXISTS `connections`;
 CREATE TABLE `connections` (
   `cnn_id` int(11) NOT NULL AUTO_INCREMENT,
-  `cnn_user` int(11) NOT NULL,
   `cnn_name` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
   `cnn_type` enum('mysql','postgresql') COLLATE utf8_unicode_ci NOT NULL,
   `cnn_status` enum('active','passive') COLLATE utf8_unicode_ci NOT NULL,
@@ -62,5 +61,11 @@ CREATE TABLE `permissions` (
 
 
 
-
+DROP TABLE IF EXISTS `active_connections`;
+CREATE TABLE `active_connections` (
+  `atc_id` int(11) NOT NULL AUTO_INCREMENT,
+  `atc_active_cnn_id` int(11) NOT NULL,
+  `atc_usr_id` int(11) NOT NULL,
+  PRIMARY KEY (`atc_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 -- 2016-12-26 15:53:40

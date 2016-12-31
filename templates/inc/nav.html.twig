@@ -18,7 +18,11 @@
                     <li {% if page == "query" %}class="active"{% endif %}><a href="/query">Query</a></li>
                 {% endif %}
 
-                <li {% if page == "setting" %}class="active"{% endif %}><a href="/setting">Settings</a></li>
+                {% if user.usr_type == "admin" %}
+                <li {% if page == "connections" %}class="active"{% endif %}><a href="/connections">Connections</a></li>
+                {% endif %}
+
+
                 {% if user.usr_type == "admin" %}
                     <li {% if page == "users" %}class="active"{% endif %}><a href="/users">Users</a></li>
                 {% endif %}
