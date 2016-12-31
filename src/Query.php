@@ -17,12 +17,15 @@ class Query
      */
     private $connection;
 
-    public function __construct($query, $connection)
+    private $connection_id;
+
+    public function __construct($query, $connection, $connection_id)
     {
         $this->query = $query;
         $this->query_hash = md5($query);
 
         $this->connection = $connection;
+        $this->connection_id = $connection_id;
     }
 
     public function getArray()
@@ -50,6 +53,8 @@ class Query
             }
         }
 
+        $this->addToQueries($data['columns'], $data['rows']);
+
 
         return [
             'status' => $status,
@@ -63,7 +68,31 @@ class Query
 
     private function getFromCache()
     {
-        return R::getRow("SELECT cch_result, cch_created_date FROM caches WHERE cch_query_hash = :query_hash ORDER BY cch_created_date DESC LIMIT 1", ['query_hash' => $this->query_hash]);
+        $result = R::getRow("SELECT que_result, que_updated_date FROM queries WHERE que_hash = :que_hash AND que_connection = :que_connection LIMIT 1", ['que_hash' => $this->query_hash, 'que_connection' => $this->connection_id]);
+
+        if ($result) {
+            $data = json_decode($result['que_result'], true);
+
+            return ['timestamp' => $result['que_updated_date'], 'columns' => $data['columns'], 'rows' => $data['rows']];
+        }
+
+        return false;
+    }
+
+    private function addToQueries($columns, $rows)
+    {
+
+        $result_string = json_encode(['columns' => $columns, 'rows' => $rows]);
+
+        R::exec("REPLACE INTO queries (que_connection, que_string, que_hash, que_cache, que_result, que_result_hash, que_updated_date, que_created_date) VALUES(:que_connection, :que_string, :que_hash, 0, :que_result, :que_result_hash,:que_updated_date, :que_created_date)", [
+            'que_connection' => $this->connection_id,
+            'que_string' => $this->query,
+            'que_hash' => $this->query_hash,
+            'que_result' => $result_string,
+            'que_result_hash' => md5($result_string),
+            'que_updated_date' => date('Y-m-d H:i:s'),
+            'que_created_date' => date('Y-m-d H:i:s')
+        ]);
     }
 
 }

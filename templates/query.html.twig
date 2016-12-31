@@ -163,7 +163,7 @@
         var formData = {query: editor.getValue()};
 
         $.ajax({
-            url: "/query/run/ajax",
+            url: "/query/run",
             type: "POST",
             data: formData,
             success: function (data, textStatus, jqXHR) {

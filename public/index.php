@@ -122,20 +122,33 @@ $user_auth = function (Request $request, Response $response, $next) use ($app) {
     // Get Flash Messages
     $app->extra['messages'] = $this->flash->getMessages();
 
-    if (!empty($active_connection['connection']['cnn_port'])) {
-        $active_connection['connection']['cnn_host'] = $active_connection['connection']['cnn_host'] . ':' . $active_connection['connection']['cnn_port'];
-    }
     try {
-        $app->connection = new PDO(
-            "mysql:host=" . $active_connection['connection']['cnn_host'] . ";dbname=" . $active_connection['connection']['cnn_database'],
-            $active_connection['connection']['cnn_username'],
-            $active_connection['connection']['cnn_password'],
-            [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
-            ]
-        );
+        if ($active_connection['cnn_type'] == "mysql") {
+            $app->connection = new PDO(
+                "mysql:host=" . $active_connection['connection']['cnn_host'] . ':' . $active_connection['connection']['cnn_port'] . ";dbname=" . $active_connection['connection']['cnn_database'],
+                $active_connection['connection']['cnn_username'],
+                $active_connection['connection']['cnn_password'],
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
+                ]
+            );
+        } else if ($active_connection['cnn_type'] == "postgresql") {
+            $app->connection = new PDO(
+                "pgsql:host=" . $active_connection['connection']['cnn_host'] . ";dbname=" . $active_connection['connection']['cnn_database'],
+                $active_connection['connection']['cnn_username'],
+                $active_connection['connection']['cnn_password'],
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
+                ]
+            );
+        } else {
+            throw new Exception("Type failed");
+        }
+
     } catch (Exception $e) {
+        var_dump($e->getMessage());
         $app->extra['connection_error'] = "true";
     }
 
@@ -149,6 +162,7 @@ require __DIR__ . '/../src/Query.php';
 // Add routes
 require __DIR__ . '/../src/routes/home_route.php';
 require __DIR__ . '/../src/routes/dashboard_route.php';
+require __DIR__ . '/../src/routes/favorite_route.php';
 require __DIR__ . '/../src/routes/query_route.php';
 require __DIR__ . '/../src/routes/setting_route.php';
 require __DIR__ . '/../src/routes/users_route.php';
