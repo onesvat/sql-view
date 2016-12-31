@@ -3,12 +3,12 @@
 
 <head>
     {% include 'inc/header.html.twig' %}
-    <title>SQLView - Dashboard</title>
+    <title>SQLView - Connections</title>
 </head>
 
 <body>
 
-{% include 'inc/nav.html.twig' with {'page': 'setting'} %}
+{% include 'inc/nav.html.twig' with {'page': 'connection'} %}
 
 <div id="wrapper">
 
@@ -97,19 +97,21 @@
                                         </div>
                                     </div>
 
+
                                     <div class="alert alert-success" style="display: none;"
                                          id="check_status_success">
                                         <button type="button" class="close" data-dismiss="alert"
                                                 aria-hidden="true">&times;</button>
-                                        <strong>Connection Established</strong>
+                                        <strong>Success!</strong> Your connection is okay.
                                     </div>
 
                                     <div class="alert alert-danger" style="display: none;"
                                          id="check_status_error">
                                         <button type="button" class="close" data-dismiss="alert"
                                                 aria-hidden="true">&times;</button>
-                                        <strong>Connection Error</strong>
+                                        <strong>Error!</strong> <span id="error_message"></span>
                                     </div>
+
 
 
                                 </form>
@@ -137,18 +139,18 @@
         e.preventDefault();
         var formData = $('#connection_form').serialize();
         $.ajax({
-            url: "/setting/connection/check/ajax",
+            url: "/connections/check",
             type: "POST",
             data: formData,
             success: function (data, textStatus, jqXHR) {
-                data = $.parseJSON(data);
                 if (data.success) {
                     $('#check_status_success').show();
+                    $('#check_status_error').hide();
                 } else {
                     $('#check_status_error').show();
+                    $('#check_status_success').hide();
+                    $('#error_message').html(data.message);
                 }
-            }, error: function (jqXHR, textStatus, errorThrown) {
-
             }
         });
     });

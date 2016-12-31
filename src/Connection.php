@@ -37,7 +37,7 @@ class Connection
     {
         if ($type == "mysql") {
             return new PDO(
-                "mysql:host=" . $settings['host'] . ':' . $settings['port'] . ";dbname=" . $settings['database'],
+                "mysql:host=" . $settings['host'] . ';port=' . $settings['port'] . ";dbname=" . $settings['database'],
                 $settings['username'],
                 $settings['password'],
                 [
@@ -45,9 +45,9 @@ class Connection
                     PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
                 ]
             );
-        } else if ($type == "postgres") {
+        } else if ($type == "postgresql") {
             return new PDO(
-                "pgsql:host=" . $settings['host'] . ':' . $settings['port'] . ";dbname=" . $settings['database'],
+                "pgsql:host=" . $settings['host'] . ';port=' . $settings['port'] . ";dbname=" . $settings['database'],
                 $settings['username'],
                 $settings['password'],
                 [

@@ -9,7 +9,7 @@ $app->get('/users', function (Request $request, Response $response, $args) use (
     $args['users'] = R::getAll("SELECT * FROM users");
 
     return $this->view->render($response, 'users.html.twig', array_merge($app->extra, $args));
-})->add($admin_auth);
+})->add($user_auth)->add($admin_auth);
 
 
 $app->get('/users/permissions/connections/{usr_id}', function (Request $request, Response $response, $args) use ($app) {
@@ -27,7 +27,7 @@ $app->get('/users/permissions/connections/{usr_id}', function (Request $request,
     }
 
     return $this->view->render($response, 'user_connection_permissions.html.twig', array_merge($app->extra, $args));
-})->add($admin_auth);
+})->add($user_auth)->add($admin_auth);
 
 
 $app->get('/users/connection/give_permission/{usr_id}/{connection_id}', function (Request $request, Response $response, $args) use ($app) {
@@ -41,7 +41,7 @@ $app->get('/users/connection/give_permission/{usr_id}/{connection_id}', function
     return $response->withRedirect('/users/permissions/connections/' . $args['usr_id']);
 
 
-})->add($admin_auth);
+})->add($user_auth)->add($admin_auth);
 
 
 $app->get('/users/connection/remove_permission/{usr_id}/{connection_id}', function (Request $request, Response $response, $args) use ($app) {
@@ -53,7 +53,7 @@ $app->get('/users/connection/remove_permission/{usr_id}/{connection_id}', functi
     return $response->withRedirect('/users/permissions/connections/' . $args['usr_id']);
 
 
-})->add($admin_auth);
+})->add($user_auth)->add($admin_auth);
 
 
 $app->get('/users/permissions/tables/{usr_id}/{connection_id}', function (Request $request, Response $response, $args) use ($app) {
@@ -92,7 +92,7 @@ $app->get('/users/permissions/tables/{usr_id}/{connection_id}', function (Reques
 
 
     return $this->view->render($response, 'user_table_permissions.html.twig', array_merge($app->extra, $args));
-})->add($admin_auth);
+})->add($user_auth)->add($admin_auth);
 
 
 $app->get('/users/tables/give_permission/{usr_id}/{connection_id}/{table_name}', function (Request $request, Response $response, $args) use ($app) {
@@ -102,7 +102,7 @@ $app->get('/users/tables/give_permission/{usr_id}/{connection_id}/{table_name}',
 
 
     return $response->withRedirect('/users/permissions/tables/' . $args['usr_id'] . '/' . $args['connection_id']);
-})->add($admin_auth);
+})->add($user_auth)->add($admin_auth);
 
 
 $app->get('/users/tables/remove_permission/{usr_id}/{connection_id}/{table_name}', function (Request $request, Response $response, $args) use ($app) {
@@ -112,7 +112,7 @@ $app->get('/users/tables/remove_permission/{usr_id}/{connection_id}/{table_name}
 
 
     return $response->withRedirect('/users/permissions/tables/' . $args['usr_id'] . '/' . $args['connection_id']);
-})->add($admin_auth);
+})->add($user_auth)->add($admin_auth);
 
 
 $app->get('/users/permissions/fields/{usr_id}/{connection_id}/{table_name}', function (Request $request, Response $response, $args) use ($app) {
@@ -153,7 +153,7 @@ $app->get('/users/permissions/fields/{usr_id}/{connection_id}/{table_name}', fun
 
 
     return $this->view->render($response, 'user_field_permissions.html.twig', array_merge($app->extra, $args));
-})->add($admin_auth);
+})->add($user_auth)->add($admin_auth);
 
 
 $app->get('/users/fields/give_permission/{usr_id}/{connection_id}/{table_name}/{field_name}', function (Request $request, Response $response, $args) use ($app) {
@@ -174,7 +174,7 @@ $app->get('/users/fields/remove_permission/{usr_id}/{connection_id}/{table_name}
 
 
     return $response->withRedirect('/users/permissions/fields/' . $args['usr_id'] . '/' . $args['connection_id'] . '/' . $args['table_name']);
-})->add($admin_auth);
+})->add($user_auth)->add($admin_auth);
 
 
 

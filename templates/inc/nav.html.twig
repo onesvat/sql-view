@@ -14,17 +14,15 @@
             <ul class="nav navbar-nav">
                 <li {% if page == "dashboard" %}class="active"{% endif %}><a href="/dashboard">Dashboard</a></li>
                 <li {% if page == "favorite" %}class="active"{% endif %}><a href="/favorite">Favorites</a></li>
-                {% if user.usr_type != "admin" %}
-                    <li {% if page == "query" %}class="active"{% endif %}><a href="/query">Query</a></li>
+                <li {% if page == "query" %}class="active"{% endif %}><a href="/query">Query</a></li>
+
+                {% if user.usr_type == "admin" %}
+                    <li {% if page == "connection" %}class="active"{% endif %}><a href="/connections">Connections</a>
+                    </li>
                 {% endif %}
 
                 {% if user.usr_type == "admin" %}
-                <li {% if page == "connections" %}class="active"{% endif %}><a href="/connections">Connections</a></li>
-                {% endif %}
-
-
-                {% if user.usr_type == "admin" %}
-                    <li {% if page == "users" %}class="active"{% endif %}><a href="/users">Users</a></li>
+                    <li {% if page == "user" %}class="active"{% endif %}><a href="/users">Users</a></li>
                 {% endif %}
 
             </ul>
@@ -34,11 +32,6 @@
                         <i class="fa fa-user fa-fw"></i> {{ user.usr_email }} <i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-user">
-                        <li><a href="/setting"><i class="fa fa-gear fa-fw"></i> Settings</a>
-                        </li>
-
-
-                        <li class="divider"></li>
                         <li><a href="/logout"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
                         </li>
                     </ul>
