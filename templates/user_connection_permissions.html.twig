@@ -61,6 +61,10 @@
                                                         <a href="/users/connection/remove_permission/{{ connection.cnn_user }}/{{ connection.cnn_id }}"
                                                            class="btn btn-xs btn-primary">Remove Permissions</a>
                                                         {% endif %}
+
+                                                        <a href="/users/permissions/tables/{{ connection.cnn_user }}/{{ connection.cnn_id }}"
+                                                           class="btn btn-xs btn-primary">Give Detailed Permissions</a>
+
                                                     </td>
                                                 </tr>
                                             {% endfor %}

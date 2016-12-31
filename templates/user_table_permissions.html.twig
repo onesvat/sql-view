@@ -42,11 +42,10 @@
                                             </thead>
                                             <tbody>
 
-                                            {% for connection in connections %}
+                                            {% for table in tables %}
                                                 <tr>
                                                     <td>
-                                                        <input type="checkbox" value=""
-                                                               name="permissions[{{ connection.cnn_id }}]" id="">
+                                                        {{ dump(table) }}
 
                                                     </td>
                                                     <td>{{ connection.cnn_name }}</td>
