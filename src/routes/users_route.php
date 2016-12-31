@@ -162,9 +162,21 @@ $app->get('/users/fields/give_permission/{usr_id}/{connection_id}/{table_name}/{
     R::exec("INSERT INTO permissions(prm_connection_id,prm_usr_id,prm_table_name,prm_field_name) VALUES(:prm_connection_id,:prm_usr_id,:prm_table_name,:prm_field_name)", ['prm_connection_id' => $args['connection_id'], 'prm_usr_id' => $args['usr_id'], 'prm_table_name' => $args['table_name'], 'prm_field_name' => $args['field_name']]);
 
 
-    return $response->withRedirect('/users/permissions/tables/' . $args['usr_id'] . '/' . $args['connection_id']);
+    return $response->withRedirect('/users/permissions/fields/' . $args['usr_id'] . '/' . $args['connection_id'] . '/' . $args['table_name']);
 
 })->add($admin_auth);
+
+
+$app->get('/users/fields/remove_permission/{usr_id}/{connection_id}/{table_name}/{field_name}', function (Request $request, Response $response, $args) use ($app) {
+
+
+    R::exec("DELETE FROM permissions WHERE prm_connection_id= :prm_connection_id AND prm_usr_id= :prm_usr_id AND prm_table_name= :prm_table_name AND prm_field_name = :prm_field_name", ['prm_connection_id' => $args['connection_id'], 'prm_usr_id' => $args['usr_id'], 'prm_table_name' => $args['table_name'], 'prm_field_name' => $args['field_name']]);
+
+
+    return $response->withRedirect('/users/permissions/fields/' . $args['usr_id'] . '/' . $args['connection_id'] . '/' . $args['table_name']);
+})->add($admin_auth);
+
+
 
 
 
