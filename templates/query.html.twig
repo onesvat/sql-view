@@ -103,30 +103,39 @@
 
                             <span id="timer">Ready</span>
 
-                            <button type="button" class="btn btn-primary pull-right" id="run_query">
-                                Run Query
-                            </button>
+                            <div class="pull-right">
+                                <input type="checkbox" id="cache_status" checked data-toggle="toggle" data-on="Cache On"
+                                       data-off="Cache Off"
+                                       data-onstyle="success">
+                                <button type="button" class="btn btn-primary" id="run_query">
+                                    Run Query
+                                </button>
+                            </div>
+
 
                         </div>
 
                         <hr/>
 
-                        <div style="background-color:white; padding: 10px; height: 54px;line-height: 34px;display: none;" id="download-panel">
+                        <div style="background-color:white; padding: 10px; height: 54px;line-height: 34px;display: none;"
+                             id="download-panel">
 
                             <div class="input-group">
 
                                 <input type="text" class="form-control" id="download_url">
 
                                 <div class="input-group-btn">
-                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
-                                            aria-haspopup="true" aria-expanded="false"><span id="download_type">CSV</span> <span class="caret"></span>
+                                    <button type="button" class="btn btn-default dropdown-toggle code_are"
+                                            data-toggle="dropdown"
+                                            aria-haspopup="true" aria-expanded="false"><span
+                                                id="download_type">CSV</span> <span class="caret"></span>
                                     </button>
                                     <ul class="dropdown-menu">
                                         <li><a href="#" id="download_csv">CSV</a></li>
                                         <li><a href="#" id="download_tsv">TSV</a></li>
                                         <li><a href="#" id="download_json">JSON</a></li>
                                     </ul>
-                                    <button type="button" class="btn btn-default">Download</button>
+                                    <a href="#" target="_blank" class="btn btn-default" id="download">Download</a>
                                 </div><!-- /btn-group -->
                             </div><!-- /input-group -->
                         </div>
@@ -185,7 +194,7 @@
         $btn.button('loading');
 
 
-        var formData = {query: editor.getValue()};
+        var formData = {query: editor.getValue(), cache: $("#cache_status").prop('checked')};
 
         $.ajax({
             url: "/query/run",
@@ -199,8 +208,16 @@
 
                 if (data.status) {
 
+                    var timer_html = "";
 
-                    $('#timer').html("Query successfully completed. (" + seconds + "." + secondTenths + "s elapsed, " + data.rows.length + " rows are returned)");
+                    if (data.results_from_cache) {
+                        timer_html += '<i class="fa fa-floppy-o" aria-hidden="true"></i> ' + data.timestamp + ' | '
+                    }
+
+                    timer_html += seconds + "." + secondTenths + "s elapsed, " + data.rows.length + " rows are returned";
+
+
+                    $('#timer').html(timer_html);
 
                     if (data.columns.length > 0) {
 
@@ -209,7 +226,9 @@
 
                         query_hash = data.query_hash;
 
-                        $("#download_url").val(domain + "query/download/" + query_hash + ".csv");
+                        $("#download_url").val(domain + "query/" + query_hash + ".csv");
+                        $("#download").attr('href', domain + "query/" + query_hash + ".csv?d=1");
+
                         var thead_str = data.columns.join("</th><th>");
                         var tfoot_str = data.columns.join("</td><td>");
                         $("#table_holder").html('<table class="table table-project" id="report-general-table" style="width: 100%"><thead><tr><th>' + thead_str + '</th></tr></thead><tfoot><tr><td>' + tfoot_str + '</td></tr></tfoot><tbody></tbody></table>');
@@ -237,20 +256,22 @@
     });
 
     $("#download_csv").click(function () {
-        $("#download_url").val(domain + "query/download/" + query_hash + ".csv");
+        $("#download_url").val(domain + "query/" + query_hash + ".csv");
         $("#download_type").html("CSV");
+        $("#download").attr('href', domain + "query/" + query_hash + ".csv?d=1");
     });
 
     $("#download_tsv").click(function () {
-        $("#download_url").val(domain + "query/download/" + query_hash + ".tsv");
+        $("#download_url").val(domain + "query/" + query_hash + ".tsv");
+        $("#download").attr('href', domain + "query/" + query_hash + ".tsv?d=1");
         $("#download_type").html("TSV");
     });
 
     $("#download_json").click(function () {
-        $("#download_url").val(domain + "query/download/" + query_hash + ".json");
+        $("#download_url").val(domain + "query/" + query_hash + ".json");
+        $("#download").attr('href', domain + "query/" + query_hash + ".json?d=1");
         $("#download_type").html("JSON");
     });
-
 
     $(".code_area").focus(function () {
         var $this = $(this);

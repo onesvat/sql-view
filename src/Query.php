@@ -33,13 +33,20 @@ class Query
         $this->connection_id = $connection->getId();
     }
 
-    public function getArray()
+    public function getArray($cache = false)
     {
+        $data = false;
+        $results_from_cache = false;
         $status = true;
         $error = "";
         $start = microtime(true);
 
-        $data = $this->getFromCache();
+
+        if ($cache === true || $cache != "false") {
+            $data = $this->getFromCache();
+            $results_from_cache = true;
+        }
+
 
         if (!$data) {
             try {
@@ -63,6 +70,7 @@ class Query
 
         return [
             'status' => $status,
+            'results_from_cache' => $results_from_cache,
             'query_hash' => $this->query_hash,
             'timestamp' => $data['timestamp'],
             'time-elapsed' => microtime(true) - $start,
