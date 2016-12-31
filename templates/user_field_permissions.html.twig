@@ -21,8 +21,7 @@
                         Connections
                         <div class="pull-right">
                             <a href="/setting/connection/new" type="button" class="btn btn-xs btn-primary"
-                               aria-label="Left Align">
-                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New Connection
+                               aria-label="Left Align"> Return to Table Permission
                             </a>
                         </div>
                     </div>
@@ -53,10 +52,10 @@
                                                     <td>{{ connection.conn.cnn_host }}</td>
                                                     <td>
 
-                                                        <a href="/setting/connection/give_permission/connection/{{ connection.cnn_id }}"
+                                                        <a href="/users/connection/give_permission/connection/{{ connection.cnn_id }}"
                                                            class="btn btn-xs btn-primary">Give Permissions</a>
 
-                                                        <a href="/setting/connection/remove_permission/{{ connection.cnn_id }}"
+                                                        <a href="/users/connection/remove_permission/{{ connection.cnn_id }}"
                                                            class="btn btn-xs btn-primary">Remove Permissions</a>
                                                     </td>
                                                 </tr>

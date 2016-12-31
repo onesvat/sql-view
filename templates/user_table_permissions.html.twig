@@ -35,22 +35,28 @@
                                             <thead>
                                             <tr>
                                                 <th>Permissions</th>
-                                                <th width="250">Actions</th>
+                                                <th width="370">Actions</th>
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            {% for table in tables %}
+                                            {% for key,table in tables %}
                                                 <tr>
                                                     <td>
                                                         {{ table }}
                                                     </td>
                                                     <td>
+                                                        {% if table_permission[key].give_permission_button == "enabled" %}
+                                                            <a href="/users/tables/give_permission/{{ usr_id }}/{{ connection_id }}/{{ table }}"
+                                                               class="btn btn-xs btn-primary">Give Permissions</a>
+                                                        {% endif %}
 
-                                                        <a href="/setting/table/give_permission/{{ connection.cnn_user }}/{{ connection.cnn_id }}/{{ table }}"
-                                                           class="btn btn-xs btn-primary">Give Permissions</a>
+                                                        {% if table_permission[key].give_permission_button == "customized" or table_permission[key].give_permission_button == "disabled" %}
+                                                            <a href="/users/tables/remove_permission/{{ usr_id }}/{{ connection_id }}/{{ table }}"
+                                                               class="btn btn-xs btn-primary">Remove Permissions</a>
+                                                        {% endif %}
 
-                                                        <a href="/setting/table/remove_permission/{{ connection.cnn_user }}/{{ connection.cnn_id }}/{{ table }}"
-                                                           class="btn btn-xs btn-primary">Remove Permissions</a>
+                                                        <a href="/users/permissions/fields/{{ usr_id }}/{{ connection_id }}/{{ table }}"
+                                                           class="btn btn-xs btn-primary">Give Detailed Permissions</a>
 
 
                                                     </td>
@@ -59,8 +65,7 @@
 
                                             </tbody>
                                         </table>
-                                        <button type="submit" class="btn btn-sm btn-primary">Update Permissions
-                                        </button>
+
                                     </form>
 
                                 </div>

@@ -58,6 +58,7 @@ $app->get('/users/connection/remove_permission/{usr_id}/{connection_id}', functi
 
 $app->get('/users/permissions/tables/{usr_id}/{connection_id}', function (Request $request, Response $response, $args) use ($app) {
 
+
     $active_connection = R::getRow("SELECT * FROM connections WHERE cnn_id = :cnn_id", ['cnn_id' => $args['connection_id']]);
     $active_connection['connection'] = json_decode($active_connection['cnn_connection'], true);
 
@@ -80,8 +81,27 @@ $app->get('/users/permissions/tables/{usr_id}/{connection_id}', function (Reques
         die;
     }
 
+    foreach ($args['tables'] as $key => $table_name) {
+        $table_permission = R::getRow("SELECT * FROM permissions WHERE prm_usr_id = :prm_usr_id AND prm_connection_id = :prm_connection_id AND prm_table_name = :prm_table_name", ['prm_usr_id' => $args['usr_id'], 'prm_connection_id' => $args['connection_id'], 'prm_table_name' => $table_name]);
+        if (empty($table_permission)) {
+            $args['table_permission'][$key]['give_permission_button'] = 'enabled';
+        } else {
+            $args['table_permission'][$key]['give_permission_button'] = 'disabled';
+        }
+    }
+
 
     return $this->view->render($response, 'user_table_permissions.html.twig', array_merge($app->extra, $args));
+})->add($admin_auth);
+
+
+$app->get('/users/tables/give_permission/{usr_id}/{connection_id}/{table_name}', function (Request $request, Response $response, $args) use ($app) {
+
+
+    R::exec("INSERT INTO permissions(prm_connection_id,prm_usr_id,prm_table_name) VALUES(:prm_connection_id,:prm_usr_id,:prm_table_name)", ['prm_connection_id' => $args['connection_id'], 'prm_usr_id' => $args['usr_id'], 'prm_table_name' => $args['table_name']]);
+
+
+    return $response->withRedirect('/users/permissions/tables/' . $args['usr_id'] . '/' . $args['connection_id']);
 })->add($admin_auth);
 
 
@@ -91,18 +111,6 @@ $app->get('/users/permissions/fields/{usr_id}/{connection_id}', function (Reques
 
 
     return $this->view->render($response, 'user_permissions.html.twig', array_merge($app->extra, $args));
-})->add($admin_auth);
-
-
-$app->get('/users/tables/give_permission/{usr_id}', function (Request $request, Response $response, $args) use ($app) {
-
-    $permissions = $request->getParam('permissions');
-//    foreach ($permissions as $key => $permission) {
-//        R::exec("DELETE FROM permissions WHERE prm_usr_id = :prm_usr_id", ['prm_usr_id' => $args['usr_id']]);
-//        R::exec("INSERT INTO permissions (prm_id,prm_usr_id) VALUES (:prm_id,:prm_usr_id)", ['prm_id' => $key, 'prm_usr_id' => $args['usr_id']]);
-//    }
-
-    return $response->withRedirect('/users');
 })->add($admin_auth);
 
 
