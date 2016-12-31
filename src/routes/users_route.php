@@ -58,44 +58,30 @@ $app->get('/users/connection/remove_permission/{usr_id}/{connection_id}', functi
 
 $app->get('/users/permissions/tables/{usr_id}/{connection_id}', function (Request $request, Response $response, $args) use ($app) {
 
-    $app->extra['active_connection'] = R::getAll("SELECT * FROM connections WHERE cnn_id = :cnn_id", ['cnn_id' => $args['connection_id']]);
+    $active_connection = R::getRow("SELECT * FROM connections WHERE cnn_id = :cnn_id", ['cnn_id' => $args['connection_id']]);
+    $active_connection['connection'] = json_decode($active_connection['cnn_connection'], true);
+
     try {
+        $app->connection = new PDO(
+            "mysql:host=" . $active_connection['connection']['cnn_host'] . ";dbname=" . $active_connection['connection']['cnn_database'],
+            $active_connection['connection']['cnn_username'],
+            $active_connection['connection']['cnn_password'],
+            [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
+            ]
+        );
 
-        var_dump($app->extra['active_connection']);
-
-        $stmt = $app->connection->prepare("SELECT TABLE_NAME as table_name, COLUMN_NAME as column_name, COLUMN_TYPE  as column_type, DATA_TYPE  as column_data_type FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA= :table_schema");
-        $stmt->execute(['table_schema' => $app->extra['active_connection']['connection']['cnn_database']]);
-        $fields = $stmt->fetchAll();
-
-        $tables = [];
-        foreach ($fields as $field) {
-            if (!array_key_exists($field['table_name'], $tables)) {
-                $tables[$field['table_name']] = ['table_name' => $field['table_name'], 'columns' => []];
-            }
-
-            $tables[$field['table_name']]['columns'][] = ['column_name' => $field['column_name'], 'column_type' => $field['column_type'], 'column_data_type' => $field['column_data_type']];
-        }
-
-
-        $tree = [];
-
-        foreach ($tables as $table) {
-            $columns = [];
-
-            foreach ($table['columns'] as $column) {
-                $columns[] = ["text" => $column['column_name'] . " - <i>" . $column['column_data_type'] . "</i>", 'column_name' => $column['column_name']];
-            }
-
-            $tree[] = ["text" => $table['table_name'], 'nodes' => $columns, 'state' => ['expanded' => false]];
-        }
-
+        $stmt = $app->connection->prepare("SHOW TABLES");
+        $stmt->execute(['table_schema' => $active_connection['connection']['cnn_database']]);
+        $args['tables'] = $stmt->fetchAll(PDO::FETCH_COLUMN);
     } catch (Exception $e) {
         echo 'Connection failed' . $e->getMessage();
         die;
     }
 
 
-    return $this->view->render($response, 'user_table_permissions.html.twig', array_merge($app->extra, $args, $tables));
+    return $this->view->render($response, 'user_table_permissions.html.twig', array_merge($app->extra, $args));
 })->add($admin_auth);
 
 

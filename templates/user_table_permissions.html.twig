@@ -22,7 +22,7 @@
                         <div class="pull-right">
                             <a href="/setting/connection/new" type="button" class="btn btn-xs btn-primary"
                                aria-label="Left Align">
-                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New Connection
+                                Return To Connection
                             </a>
                         </div>
                     </div>
@@ -34,28 +34,22 @@
                                         <table class="table table-bordered table-hover table-striped">
                                             <thead>
                                             <tr>
-                                                <th width="10">Permissions</th>
-                                                <th>Connection</th>
-                                                <th>Server</th>
-                                                <th width="180">Actions</th>
+                                                <th>Permissions</th>
+                                                <th width="250">Actions</th>
                                             </tr>
                                             </thead>
                                             <tbody>
-
                                             {% for table in tables %}
                                                 <tr>
                                                     <td>
-                                                        {{ dump(table) }}
-
+                                                        {{ table }}
                                                     </td>
-                                                    <td>{{ connection.cnn_name }}</td>
-                                                    <td>{{ connection.conn.cnn_host }}</td>
                                                     <td>
 
-                                                        <a href="/setting/connection/give_permission/connection/{{ connection.cnn_id }}"
+                                                        <a href="/setting/table/give_permission/{{ connection.cnn_user }}/{{ connection.cnn_id }}/{{ table }}"
                                                            class="btn btn-xs btn-primary">Give Permissions</a>
 
-                                                        <a href="/setting/connection/remove_permission/{{ connection.cnn_id }}"
+                                                        <a href="/setting/table/remove_permission/{{ connection.cnn_user }}/{{ connection.cnn_id }}/{{ table }}"
                                                            class="btn btn-xs btn-primary">Remove Permissions</a>
 
 
