@@ -54,7 +54,8 @@
                                     <pre id="editor" style="height: 400px;">SELECT * FROM users;</pre>
                                 </div>
                             {% endif %}
-                            <div role="tabpanel" class="tab-pane {% if permission != "full" %} active {% endif %}" id="gui">
+                            <div role="tabpanel" class="tab-pane {% if permission != "full" %} active {% endif %}"
+                                 id="gui">
                                 <div class="well" style="margin: 0;height: 400px;overflow-y: auto;width: 100%;">
                                     <form class="form-horizontal">
                                         <div class="form-group">
@@ -75,9 +76,6 @@
                                             <div class="col-sm-10">
                                                 <select class="select2 form-control" multiple="multiple" name="fields"
                                                         id="fields" style="width: 100%">
-                                                    {% for table in tables %}
-                                                        <option value="{{ table.table_name }}">{{ table.table_name }}</option>
-                                                    {% endfor %}
                                                 </select>
                                             </div>
                                         </div>
@@ -180,6 +178,7 @@
 
     $('#run_query').click(function () {
 
+
         $("#error_holder").hide();
         $("#result-panel").hide();
 
@@ -198,11 +197,22 @@
         var $btn = $(this);
         $btn.button('loading');
 
+        if ($("#gui").hasClass("active")) {
+            var formData = {
+                tables: $("#tables").val(),
+                fields: $("#fields").val(),
+                builder: $('#builder-basic').queryBuilder('getSQL', false),
+                cache: $("#cache_status").prop('checked')
+            };
+            var url = "/query/run/gui";
+        } else {
+            var formData = {query: editor.getValue(), cache: $("#cache_status").prop('checked')};
+            var url = "/query/run";
+        }
 
-        var formData = {query: editor.getValue(), cache: $("#cache_status").prop('checked')};
 
         $.ajax({
-            url: "/query/run",
+            url: url,
             type: "POST",
             data: formData,
             success: function (data, textStatus, jqXHR) {
@@ -236,7 +246,7 @@
 
                         var thead_str = data.columns.join("</th><th>");
                         var tfoot_str = data.columns.join("</td><td>");
-                        $("#table_holder").html('<table class="table table-project" id="report-general-table" style="width: 100%"><thead><tr><th>' + thead_str + '</th></tr></thead><tfoot><tr><td>' + tfoot_str + '</td></tr></tfoot><tbody></tbody></table>');
+                        $("#table_holder").html('<table class="table table-project" id="report-general-table" style="width: 100%"><thead><tr><th>' + thead_str + '</th></tr></thead><tbody></tbody></table>');
 
                         var reportTable = $('#report-general-table').DataTable({
                             dom: "<'row'><'row'<'col-sm-12'tr>><'row'<'col-sm-5'i><'col-sm-7'p>>",
@@ -290,7 +300,6 @@
         });
     });
 
-
 </script>
 
 <script>
@@ -308,64 +317,40 @@
 </script>
 
 <script type="text/javascript">
-    $("#tables").select2().on('change', function (evt, data) {
-        console.log($(this).val());
-    });
-    $("#fields").select2().on('change', function (evt, data) {
-        console.log($(this).val());
-    });
 
+    var fields = [];
+    function refreshSelect($input, data) {
+        $input.html($(''));
+        for (var key in data) {
+            var $option = $('<option />')
+                    .prop('value', data[key]['id'])
+                    .text(data[key]['text'])
+                    ;
+            $input.append($option)
+        }
+        $input.trigger('change');
+    }
 
-    $('#builder-basic').queryBuilder({
-        plugins: ['bt-tooltip-errors'],
+    $("#tables").select2().on('change', function () {
+        $.ajax({
+            url: "/query/get_fields",
+            type: "POST",
+            data: {tables: $(this).val()},
+            success: function (data, textStatus, jqXHR) {
+                var $input = $('#fields');
+                refreshSelect($input, data.data)
 
-        filters: [{
-            id: 'name',
-            label: 'Name',
-            type: 'string'
-        }, {
-            id: 'category',
-            label: 'Category',
-            type: 'integer',
-            input: 'select',
-            values: {
-                1: 'Books',
-                2: 'Movies',
-                3: 'Music',
-                4: 'Tools',
-                5: 'Goodies',
-                6: 'Clothes'
-            },
-            operators: ['equal', 'not_equal', 'in', 'not_in', 'is_null', 'is_not_null']
-        }, {
-            id: 'in_stock',
-            label: 'In stock',
-            type: 'integer',
-            input: 'radio',
-            values: {
-                1: 'Yes',
-                0: 'No'
-            },
-            operators: ['equal']
-        }, {
-            id: 'price',
-            label: 'Price',
-            type: 'double',
-            validation: {
-                min: 0,
-                step: 0.01
+                if (data.filter.length > 0) {
+                    $('#builder-basic').queryBuilder('destroy');
+                    $('#builder-basic').queryBuilder({
+                        filters: data.filter
+                    });
+                }
             }
-        }, {
-            id: 'id',
-            label: 'Identifier',
-            type: 'string',
-            placeholder: '____-____-____',
-            operators: ['equal', 'not_equal'],
-            validation: {
-                format: /^.{4}-.{4}-.{4}$/
-            }
-        }]
-    });
+        });
+    })
+
+    $("#fields").select2();
 
 </script>
 
