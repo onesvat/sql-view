@@ -1,4 +1,5 @@
 <?php
+use RedBeanPHP\R;
 
 /**
  * Created by PhpStorm.
@@ -104,18 +105,23 @@ class Connection
         $connections = [];
         $permissions = [];
 
-        foreach (R::getAll("SELECT * FROM permissions WHERE prm_usr = :usr_id", ['usr_id' => $usr_id]) as $permission) {
+        foreach (R::getAll("SELECT * FROM permissions WHERE prm_user = :usr_id", ['usr_id' => $usr_id]) as $permission) {
             $permissions[$permission['prm_connection']] = $permission;
         }
 
         foreach (R::getAll("SELECT * FROM connections") as $connection) {
             if (array_key_exists($connection['cnn_id'], $permissions)) {
-                $connection['permission'] = json_decode($permissions[$connection['cnn_id']]['prm_permission'], true);
+
+                $connection['permission_type'] = $permissions[$connection['cnn_id']]['prm_permission_type'];
+
+                if ($permissions[$connection['cnn_id']]['prm_permission_type'] == "partial") {
+                    $connection['permission'] = json_decode($permissions[$connection['cnn_id']]['prm_permission'], true);
+                }
             } else {
-                $connection['permission'] = [];
+                $connection['permission_type'] = "none";
             }
 
-            $connections[] = $connections;
+            $connections[] = $connection;
         }
 
         return $connections;
@@ -124,6 +130,7 @@ class Connection
     public static function getConnections()
     {
         $connections = [];
+
         foreach (R::getAll("SELECT * FROM connections") as $connection) {
             $settings = json_decode($connection['cnn_connection'], true);
 
@@ -135,12 +142,34 @@ class Connection
                 'database' => $settings['cnn_database']
             ]);
 
-            $connection['fields'] = $conn_object->getFields();
+            $connection['tables'] = $conn_object->getFields();
 
-            $connections[] = $connections;
+            $connections[] = $connection;
         }
 
         return $connections;
+    }
+
+    public static function getConnectionFromId($cnn_id)
+    {
+        $connection = R::getRow("SELECT * FROM connections WHERE cnn_id = :cnn_id", ['cnn_id' => $cnn_id]);
+
+        if ($connection) {
+
+            $settings = json_decode($connection['cnn_connection'], true);
+
+            $conn_object = new Connection($connection['cnn_id'], $connection['cnn_type'], [
+                'host' => $settings['cnn_host'],
+                'port' => $settings['cnn_port'],
+                'username' => $settings['cnn_username'],
+                'password' => $settings['cnn_password'],
+                'database' => $settings['cnn_database']
+            ]);
+
+            return $conn_object;
+        }
+
+        return null;
     }
 
 }

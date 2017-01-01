@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% include 'inc/header.html.twig' %}
+    <title>SQLView - Users</title>
+</head>
+
+<body>
+
+{% include 'inc/nav.html.twig' with {'page': 'user'} %}
+
+<div id="wrapper">
+
+    <div class="container">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Partial Permission For {{ connection.cnn_name }}
+                        <div class="pull-right">
+                            <a href="/users/permission/{{ usr_id }}" type="button" class="btn btn-xs btn-primary"
+                               aria-label="Left Align">
+                                <span class="glyphicon glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                                Permissions
+                            </a>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div id="tree" class=""></div>
+                                <button type="button" id="save" class="btn btn-sm btn-primary">Save
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.col-lg-4 -->
+        </div>
+
+    </div><!-- /.container -->
+
+</div>
+<!-- /#wrapper -->
+
+{% include 'inc/footer.html.twig' %}
+
+<script>
+
+    $("#save").click(function () {
+        $.ajax({
+            url: "/connections/check",
+            type: "POST",
+            data: $('#tree').treeview('getChecked'),
+            success: function (data, textStatus, jqXHR) {
+
+            }
+        });
+    });
+
+    var tree = $('#tree').treeview({
+        showCheckbox: true,
+        data: JSON.parse('{{ tree|raw }}')
+    }).on('nodeSelected', function (event, data) {
+        editor.insert(data.column_name)
+    });
+
+    function adjustParent(node) {
+        var parent = tree.treeview('getParent', node);
+        if (parent !== tree) {
+            var checked = 0;
+            for (var i in parent.nodes) {
+                if (parent.nodes[i].state.checked) {
+                    checked++;
+                }
+            }
+            if ((parent.nodes.length == checked) != parent.state.checked) {
+                tree.treeview(parent.state.checked ? 'uncheckNode' : 'checkNode', [parent.nodeId, {silent: true}]);
+            }
+            adjustParent(parent);
+        }
+    }
+    var inEvent = 0;
+    tree.on('nodeChecked ', function (ev, node) {
+        inEvent++;
+        if (node.nodes !== undefined) {
+            for (var i in node.nodes) {
+                tree.treeview('checkNode', node.nodes[i].nodeId);
+            }
+        }
+        inEvent--;
+        if (inEvent == 0) {
+            adjustParent(node);
+        }
+    }).on('nodeUnchecked ', function (ev, node) {
+        inEvent++;
+        if (node.nodes !== undefined) {
+            for (var i in node.nodes) {
+                tree.treeview('uncheckNode', node.nodes[i].nodeId);
+            }
+        }
+        inEvent--;
+        if (inEvent == 0) {
+            adjustParent(node);
+        }
+    });
+</script>
+</body>
+
+</html>
