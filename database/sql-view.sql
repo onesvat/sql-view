@@ -55,10 +55,11 @@ DROP TABLE IF EXISTS `queries`;
 CREATE TABLE `queries` (
   `que_id` int(11) NOT NULL AUTO_INCREMENT,
   `que_favorite` enum('yes','no') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'no',
+  `que_user` int(11) NOT NULL,
   `que_connection` int(11) NOT NULL,
+  `que_cache` int(11) NOT NULL,
   `que_string` text COLLATE utf8_unicode_ci NOT NULL,
   `que_hash` char(32) COLLATE utf8_unicode_ci NOT NULL,
-  `que_cache` int(11) NOT NULL,
   `que_result` longtext COLLATE utf8_unicode_ci NOT NULL,
   `que_result_hash` char(32) COLLATE utf8_unicode_ci NOT NULL,
   `que_updated_date` timestamp NOT NULL,
@@ -78,4 +79,4 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
--- 2017-01-01 09:46:11
+-- 2017-01-01 23:04:38
