@@ -10,6 +10,10 @@ $app->get('/', function (Request $request, Response $response, $args) use ($app)
     return $response->withRedirect('/dashboard');
 })->add($user_auth);
 
+$app->get('/connection/change/{cnn_id}', function (Request $request, Response $response, $args) use ($app) {
+    R::exec("REPLACE INTO active_connections SET atc_usr_id = :usr_id, atc_active_cnn_id = :cnn_id", ['usr_id' => $app->extra['user']['usr_id'], 'cnn_id' => $args['cnn_id']]);
+    return $response->withRedirect($_SERVER['HTTP_REFERER']);
+})->add($user_auth);
 
 $app->get('/login', function (Request $request, Response $response, $args) use ($app) {
     $app->extra['messages'] = $this->flash->getMessages();
@@ -40,7 +44,6 @@ $app->post('/login', function (Request $request, Response $response, $args) use 
 
 });
 
-
 $app->get('/register', function (Request $request, Response $response, $args) use ($app) {
     $app->extra['messages'] = $this->flash->getMessages();
 
@@ -68,11 +71,9 @@ $app->post('/register', function (Request $request, Response $response, $args) u
     return $response->withRedirect('/login');
 });
 
-
 $app->get('/logout', function (Request $request, Response $response, $args) {
-    $_SESSION['login'] = false;
-    $_SESSION['admin'] = false;
-    $_SESSION['usr_id'] = -1;
+    session_destroy();
 
     return $response->withRedirect("/");
 });
+
