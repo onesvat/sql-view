@@ -6,8 +6,9 @@ use RedBeanPHP\R;
 
 $app->get('/query', function (Request $request, Response $response, $args) use ($app) {
 
+    $connection = new Connection($app->extra['active_connection'], $app->extra['user']);
 
-    $tables = $app->connection->getFields();
+    $tables = $connection->getFields();
 
     $tree = [];
 
@@ -23,6 +24,7 @@ $app->get('/query', function (Request $request, Response $response, $args) use (
 
     $args['tables'] = $tables;
     $args['tree'] = json_encode($tree);
+    $args['permission'] = $connection->getPermissionType();
 
     return $this->view->render($response, 'query.html.twig', array_merge($app->extra, $args));
 })->add($user_auth);
@@ -31,16 +33,16 @@ $app->post('/query/run', function (Request $request, Response $response, $args) 
     $query_string = $request->getParam('query');
     $cache = $request->getParam('cache');
 
-    $query = new Query($query_string, $app->connection);
+    $query = new Query($query_string, new Connection($app->extra['active_connection']), $app->extra['user']);
     $result = $query->getArray($cache);
     return $response->withJson($result, 200);
 })->add($user_auth);
 
 $app->get('/query/{query_hash}.{download_type}', function (Request $request, Response $response, $args) use ($app) {
 
-    $query_string = R::getCell("SELECT que_string FROM queries WHERE que_hash = :que_hash", ['que_hash' => $args['query_hash']]);
+    $_query = R::getRow("SELECT * FROM queries WHERE que_hash = :que_hash", ['que_hash' => $args['query_hash']]);
 
-    if (!$query_string) {
+    if (!$_query) {
         return $response->withStatus(400);
     }
 
@@ -48,7 +50,12 @@ $app->get('/query/{query_hash}.{download_type}', function (Request $request, Res
         header("Content-Disposition: attachment;filename={$args['query_hash']}.{$args['download_type']}");
     }
 
-    $query = new Query($query_string, $app->connection);
+    $user = R::getRow("SELECT * FROM users WHERE usr_id = :que_user", ['que_user' => $_query['que_user']]);
+    $connection = R::getRow("SELECT * FROM connections WHERE cnn_id = :que_connection", ['que_connection' => $_query['que_connection']]);
+
+    $connection['cnn_settings'] = json_decode($connection['cnn_connection'], true);
+
+    $query = new Query($_query['que_string'], new Connection($connection, $user), $user);
     $result = $query->getArray(true);
 
     if ($args['download_type'] == "json") {
@@ -74,8 +81,7 @@ $app->get('/query/{query_hash}.{download_type}', function (Request $request, Res
         return $response->withStatus(400);
     }
 
-})->add($user_auth);
-
+});
 
 
 

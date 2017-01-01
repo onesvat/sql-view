@@ -9,38 +9,63 @@ use RedBeanPHP\R;
  */
 class Connection
 {
-    private $id, $type, $settings;
+    private $connection, $user;
 
     /**
      * @var PDO
      */
-    private $connection;
+    private $pdo;
 
-    public function __construct($id, $type, $settings)
+    private $permission_type, $permission;
+
+    public function __construct($connection, $user = null)
     {
-        $this->id = $id;
-        $this->type = $type;
-        $this->settings = $settings;
+        $this->connection = $connection;
+        $this->user = $user;
 
-        $this->connection = $this->createPDO($type, $settings);
+        $this->pdo = $this->createPDO($connection['cnn_type'], $connection['cnn_settings']);
+
+        if ($user == null || $user['usr_type'] == "admin") {
+            $this->permission_type = "full";
+        } else {
+            $permission = R::getRow("SELECT * FROM permissions WHERE prm_user = :usr_id AND prm_connection = :cnn_id", ['usr_id' => $user['usr_id'], 'cnn_id' => $connection['cnn_id']]);
+
+            if ($permission) {
+                $this->permission_type = $permission['prm_permission_type'];
+
+                if ($permission['prm_permission_type'] == "partial") {
+                    $this->permission = json_decode($permission['prm_permission'], true);
+                }
+            } else {
+                $this->permission_type = "none";
+            }
+        }
     }
 
-    public function getFields()
+
+    /**
+     * @return mixed
+     */
+    public function getId()
     {
-        if ($this->type == "mysql") {
-            return $this->getMysqlFields();
-        } else if ($this->type == "postgresql") {
-            return $this->getPostgresqlFields();
-        }
+        return $this->connection['cnn_id'];
+    }
+
+    /**
+     * @return PDO
+     */
+    public function getConnection()
+    {
+        return $this->pdo;
     }
 
     private function createPDO($type, $settings)
     {
         if ($type == "mysql") {
             return new PDO(
-                "mysql:host=" . $settings['host'] . ';port=' . $settings['port'] . ";dbname=" . $settings['database'],
-                $settings['username'],
-                $settings['password'],
+                "mysql:host=" . $settings['cnn_host'] . ';port=' . $settings['cnn_port'] . ";dbname=" . $settings['cnn_database'],
+                $settings['cnn_username'],
+                $settings['cnn_password'],
                 [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
@@ -48,9 +73,9 @@ class Connection
             );
         } else if ($type == "postgresql") {
             return new PDO(
-                "pgsql:host=" . $settings['host'] . ';port=' . $settings['port'] . ";dbname=" . $settings['database'],
-                $settings['username'],
-                $settings['password'],
+                "pgsql:host=" . $settings['cnn_host'] . ';port=' . $settings['cnn_port'] . ";dbname=" . $settings['cnn_database'],
+                $settings['cnn_username'],
+                $settings['cnn_password'],
                 [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
@@ -61,10 +86,46 @@ class Connection
         }
     }
 
+
+    public function getFields()
+    {
+        $tables = [];
+
+        if ($this->connection['cnn_type'] == "mysql") {
+            $tables = $this->getMysqlFields();
+        } else if ($this->connection['cnn_type'] == "postgresql") {
+            $tables = $this->getPostgresqlFields();
+        }
+
+        if ($this->permission_type == "full") {
+            return $tables;
+        } else {
+
+            $partial_tables = [];
+
+            foreach ($tables as $table) {
+                if (array_key_exists($table['table_name'], $this->permission)) {
+                    $partial_tables[$table['table_name']] = ['table_name' => $table['table_name'], 'columns' => []];
+
+                    foreach ($table['columns'] as $column) {
+                        if (in_array($column['column_name'], $this->permission[$table['table_name']])) {
+                            $partial_tables[$table['table_name']]['columns'][] = ['column_name' => $column['column_name'], 'column_type' => $column['column_type'], 'column_data_type' => $column['column_data_type']];
+                        }
+                    }
+                }
+
+
+            }
+
+            return $partial_tables;
+        }
+    }
+
+
     private function getMysqlFields()
     {
-        $stmt = $this->connection->prepare("SELECT TABLE_NAME table_name, COLUMN_NAME column_name, COLUMN_TYPE column_type, DATA_TYPE column_data_type FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=:table_schema");
-        $stmt->execute(['table_schema' => $this->settings['database']]);
+        $stmt = $this->pdo->prepare("SELECT TABLE_NAME table_name, COLUMN_NAME column_name, COLUMN_TYPE column_type, DATA_TYPE column_data_type FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=:table_schema");
+        $stmt->execute(['table_schema' => $this->connection['cnn_settings']['cnn_database']]);
         $fields = $stmt->fetchAll();
 
         $tables = [];
@@ -82,22 +143,6 @@ class Connection
     private function getPostgresqlFields()
     {
         return [];
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @return PDO
-     */
-    public function getConnection()
-    {
-        return $this->connection;
     }
 
     public static function getConnectionsWithPermissions($usr_id)
@@ -156,20 +201,22 @@ class Connection
 
         if ($connection) {
 
-            $settings = json_decode($connection['cnn_connection'], true);
+            $connection['cnn_settings'] = json_decode($connection['cnn_connection'], true);
 
-            $conn_object = new Connection($connection['cnn_id'], $connection['cnn_type'], [
-                'host' => $settings['cnn_host'],
-                'port' => $settings['cnn_port'],
-                'username' => $settings['cnn_username'],
-                'password' => $settings['cnn_password'],
-                'database' => $settings['cnn_database']
-            ]);
+            $conn_object = new Connection($connection);
 
             return $conn_object;
         }
 
         return null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPermissionType()
+    {
+        return $this->permission_type;
     }
 
 }

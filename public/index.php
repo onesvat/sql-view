@@ -118,7 +118,7 @@ $user_auth = function (Request $request, Response $response, $next) use ($app) {
         R::exec("REPLACE INTO active_connections SET atc_usr_id = :usr_id, atc_active_cnn_id = :cnn_id", ['usr_id' => $user['usr_id'], 'cnn_id' => $active_connection['cnn_id']]);
     }
 
-    $active_connection['settings'] = json_decode($active_connection['cnn_connection'], true);
+    $active_connection['cnn_settings'] = json_decode($active_connection['cnn_connection'], true);
 
     $app->extra['all_connections'] = $connections;
     $app->extra['active_connection'] = $active_connection;

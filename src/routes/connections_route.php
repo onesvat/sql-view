@@ -43,19 +43,13 @@ $app->get('/connections', function (Request $request, Response $response, $args)
     $connections = R::getAll("SELECT * FROM connections");
 
     foreach ($connections as &$connection) {
-        $settings = json_decode($connection['cnn_connection'], true);
+        $connection['cnn_settings'] = json_decode($connection['cnn_connection'], true);
 
-        $connection['cnn_host'] = $settings['cnn_host'];
-        $connection['cnn_database'] = $settings['cnn_database'];
+        $connection['cnn_host'] = $connection['cnn_settings']['cnn_host'];
+        $connection['cnn_database'] = $connection['cnn_settings']['cnn_database'];
 
         try {
-            new Connection(0, $connection['cnn_type'], [
-                'host' => $settings['cnn_host'],
-                'port' => $settings['cnn_port'],
-                'username' => $settings['cnn_username'],
-                'password' => $settings['cnn_password'],
-                'database' => $settings['cnn_database']
-            ]);
+            new Connection($connection);
 
             $connection['cnn_connection_status'] = true;
         } catch (Exception $e) {

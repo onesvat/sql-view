@@ -53,19 +53,12 @@ $app->get('/users/permission/{usr_id}', function (Request $request, Response $re
 
 
     foreach ($connections as &$connection) {
-        $settings = json_decode($connection['cnn_connection'], true);
-
-        $connection['cnn_host'] = $settings['cnn_host'];
-        $connection['cnn_database'] = $settings['cnn_database'];
+        $connection['cnn_settings'] = json_decode($connection['cnn_connection'], true);
+        $connection['cnn_host'] = $connection['cnn_settings']['cnn_host'];
+        $connection['cnn_database'] = $connection['cnn_settings']['cnn_database'];
 
         try {
-            new Connection(0, $connection['cnn_type'], [
-                'host' => $settings['cnn_host'],
-                'port' => $settings['cnn_port'],
-                'username' => $settings['cnn_username'],
-                'password' => $settings['cnn_password'],
-                'database' => $settings['cnn_database']
-            ]);
+            new Connection($connection, null);
 
             $connection['cnn_connection_status'] = true;
         } catch (Exception $e) {
@@ -113,7 +106,6 @@ $app->get('/users/permission/set/{usr_id}', function (Request $request, Response
             } else {
                 $checked = false;
             }
-
 
 
             $columns[] = ['type' => 'column', 'table_name' => $table['table_name'], 'column_name' => $column['column_name'], "text" => $column['column_name'] . " - <i>" . $column['column_data_type'] . "</i>", 'state' => ['checked' => $checked, 'selectable' => false]];

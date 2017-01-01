@@ -19,18 +19,23 @@ class Query
 
     private $connection_id;
 
+    private $user;
+
     /**
      * Query constructor.
      * @param $query
      * @param Connection $connection
+     * @param $user
      */
-    public function __construct($query, $connection)
+    public function __construct($query, $connection, $user = null)
     {
         $this->query = $query;
         $this->query_hash = md5($query);
 
         $this->pdo = $connection->getConnection();
         $this->connection_id = $connection->getId();
+
+        $this->user = $user;
     }
 
     public function getArray($cache = false)
@@ -96,9 +101,11 @@ class Query
     private function addToQueries($columns, $rows)
     {
 
+
         $result_string = json_encode(['columns' => $columns, 'rows' => $rows]);
 
-        R::exec("REPLACE INTO queries (que_connection, que_string, que_hash, que_cache, que_result, que_result_hash, que_updated_date, que_created_date) VALUES(:que_connection, :que_string, :que_hash, 0, :que_result, :que_result_hash,:que_updated_date, :que_created_date)", [
+        R::exec("REPLACE INTO queries (que_user, que_connection, que_string, que_hash, que_cache, que_result, que_result_hash, que_updated_date, que_created_date) VALUES(:que_user, :que_connection, :que_string, :que_hash, 0, :que_result, :que_result_hash,:que_updated_date, :que_created_date)", [
+            'que_user' => $this->user['usr_id'],
             'que_connection' => $this->connection_id,
             'que_string' => $this->query,
             'que_hash' => $this->query_hash,

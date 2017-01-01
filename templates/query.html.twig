@@ -36,20 +36,25 @@
                     <div class="col-lg-12" style="padding: 0px;">
                         <!-- Nav tabs -->
                         <ul class="nav nav-tabs" role="tablist">
-                            <li role="presentation" class="active"><a href="#sql" aria-controls="sql" role="tab"
-                                                                      data-toggle="tab" id="sql_mode_button">SQL
-                                    Mode</a>
-                            </li>
-                            <li role="presentation"><a href="#gui" aria-controls="gui" role="tab" data-toggle="tab">GUI
+                            {% if permission == "full" %}
+                                <li role="presentation" class="active"><a href="#sql" aria-controls="sql" role="tab"
+                                                                          data-toggle="tab" id="sql_mode_button">SQL
+                                        Mode</a>
+                                </li>
+                            {% endif %}
+                            <li role="presentation" {% if permission != "full" %} class="active" {% endif %}><a
+                                        href="#gui" aria-controls="gui" role="tab" data-toggle="tab">GUI
                                     Mode</a></li>
                         </ul>
 
                         <!-- Tab panes -->
                         <div class="tab-content" style="height: 430px;">
-                            <div role="tabpanel" class="tab-pane active" id="sql">
-                                <pre id="editor" style="height: 400px;">SELECT * FROM users;</pre>
-                            </div>
-                            <div role="tabpanel" class="tab-pane" id="gui">
+                            {% if permission == "full" %}
+                                <div role="tabpanel" class="tab-pane active" id="sql">
+                                    <pre id="editor" style="height: 400px;">SELECT * FROM users;</pre>
+                                </div>
+                            {% endif %}
+                            <div role="tabpanel" class="tab-pane {% if permission != "full" %} active {% endif %}" id="gui">
                                 <div class="well" style="margin: 0;height: 400px;overflow-y: auto;width: 100%;">
                                     <form class="form-horizontal">
                                         <div class="form-group">
