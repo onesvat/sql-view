@@ -35,7 +35,7 @@
                                         <tr>
                                             <th>E-mail</th>
                                             <th>Type</th>
-                                            <th width="200">Actions</th>
+                                            <th width="240">Actions</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -44,11 +44,12 @@
                                                 <td>{{ user.usr_email }}</td>
                                                 <td>
                                                     <span class="label label-default">{{ user.usr_type }}</span></td>
-                                                <td>
+                                                <td class="text-center">
                                                     <a href="/users/edit/{{ user.usr_id }}"
                                                        class="btn btn-xs btn-primary">Edit</a>
-                                                    <a href="/users/permission/{{ user.usr_id }}"
-                                                       class="btn btn-xs btn-primary">Permissions</a>
+                                                    <a {% if user.usr_type == "admin" %}disabled=""{% endif %}
+                                                       href="{% if user.usr_type == "admin" %}#{% else %}/users/permission/{{ user.usr_id }}{% endif %}"
+                                                       class="btn btn-xs btn-primary">{% if user.usr_type == "admin" %}Full Permission{% else %}Permissions{% endif %}</a>
                                                     <a href="/users/remove/{{ user.usr_id }}"
                                                        class="btn btn-xs btn-danger">Remove</a>
                                                 </td>

@@ -46,7 +46,6 @@ $app->post('/users/edit/{usr_id}', function (Request $request, Response $respons
     return $response->withRedirect('/users');
 })->add($user_auth)->add($admin_auth);
 
-
 $app->get('/users/permission/{usr_id}', function (Request $request, Response $response, $args) use ($app) {
 
 
@@ -79,7 +78,6 @@ $app->get('/users/permission/{usr_id}', function (Request $request, Response $re
     return $this->view->render($response, 'users_permission.html.twig', array_merge($app->extra, $args));
 })->add($user_auth)->add($admin_auth);
 
-
 $app->get('/users/permission/set/{usr_id}', function (Request $request, Response $response, $args) use ($app) {
     $usr_id = $args['usr_id'];
     $cnn_id = $request->getParam('cnn_id');
@@ -90,6 +88,14 @@ $app->get('/users/permission/set/{usr_id}', function (Request $request, Response
         return $response->withRedirect("/users/permission/{$usr_id}");
     }
 
+    $prm_permission = R::getCell("SELECT prm_permission FROM permissions WHERE prm_user = :usr_id AND prm_connection = :cnn_id", ['usr_id' => $usr_id, 'cnn_id' => $cnn_id]);
+
+    if ($prm_permission) {
+        $permissions = json_decode($prm_permission, true);
+    } else {
+        $permissions = [];
+    }
+
 
     $tables = Connection::getConnectionFromId($cnn_id)->getFields();
 
@@ -98,11 +104,22 @@ $app->get('/users/permission/set/{usr_id}', function (Request $request, Response
     foreach ($tables as $table) {
         $columns = [];
 
+        $expanded = false;
+
         foreach ($table['columns'] as $column) {
-            $columns[] = ['type' => 'column', 'table_name' => $table['table_name'], 'column_name' => $column['column_name'], "text" => $column['column_name'] . " - <i>" . $column['column_data_type'] . "</i>",];
+            if (array_key_exists($table['table_name'], $permissions) && in_array($column['column_name'], $permissions[$table['table_name']])) {
+                $checked = true;
+                $expanded = true;
+            } else {
+                $checked = false;
+            }
+
+
+
+            $columns[] = ['type' => 'column', 'table_name' => $table['table_name'], 'column_name' => $column['column_name'], "text" => $column['column_name'] . " - <i>" . $column['column_data_type'] . "</i>", 'state' => ['checked' => $checked, 'selectable' => false]];
         }
 
-        $tree[] = ['type' => 'table', 'table_name' => $table['table_name'], "text" => $table['table_name'], 'nodes' => $columns, 'state' => ['expanded' => false]];
+        $tree[] = ['type' => 'table', 'table_name' => $table['table_name'], "text" => $table['table_name'], 'nodes' => $columns, 'state' => ['expanded' => $expanded, 'selectable' => false]];
     }
 
 
@@ -116,41 +133,13 @@ $app->get('/users/permission/set/{usr_id}', function (Request $request, Response
 
 })->add($user_auth)->add($admin_auth);
 
+$app->post('/users/permission/set/partial/{usr_id}', function (Request $request, Response $response, $args) use ($app) {
 
-//$app->post('/users/permission/set/{usr_id}', function (Request $request, Response $response, $args) use ($app) {
-//    $usr_id = $args['usr_id'];
-//    $cnn_id = $request->getParam('cnn_id');
-//    $permission = $request->getParam('permission');
-//
-//    if ($permission == "full" || $permission == "none") {
-//        R::exec("REPLACE INTO permissions SET prm_user = :usr_id, prm_connection = :cnn_id, prm_permission_type = :permission", ['usr_id' => $usr_id, 'cnn_id' => $cnn_id, 'permission' => $permission]);
-//        return $response->withRedirect("/users/permission/{$usr_id}");
-//    }
-//
-//
-//    $tables = Connection::getConnectionFromId($cnn_id)->getFields();
-//
-//    $tree = [];
-//
-//    foreach ($tables as $table) {
-//        $columns = [];
-//
-//        foreach ($table['columns'] as $column) {
-//            $columns[] = ['type' => 'column', 'table_name' => $table['table_name'], 'column_name' => $column['column_name'], "text" => $column['column_name'] . " - <i>" . $column['column_data_type'] . "</i>",];
-//        }
-//
-//        $tree[] = ['type' => 'table', 'table_name' => $table['table_name'], "text" => $table['table_name'], 'nodes' => $columns, 'state' => ['expanded' => false]];
-//    }
-//
-//
-//    $args['tree'] = json_encode($tree);
-//    $args['connection'] = R::getRow("SELECT * FROM connections WHERE cnn_id = :cnn_id", [':cnn_id' => $cnn_id]);
-//    $args['usr_id'] = $usr_id;
-//
-//
-//    return $this->view->render($response, 'users_permission_detailed.html.twig', array_merge($app->extra, $args));
-//
-//})->add($user_auth)->add($admin_auth);
+    $usr_id = $args['usr_id'];
+    $cnn_id = $request->getParam('cnn_id');
 
+    $permission = $request->getParam('data');
 
+    R::exec("REPLACE INTO permissions SET prm_user = :usr_id, prm_connection = :cnn_id, prm_permission_type = :permission_type, prm_permission = :permission", ['usr_id' => $usr_id, 'cnn_id' => $cnn_id, 'permission_type' => 'partial', 'permission' => $permission]);
 
+})->add($user_auth)->add($admin_auth);
