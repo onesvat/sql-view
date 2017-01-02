@@ -68,7 +68,7 @@ $app->post('/setup', function (Request $request, Response $response, $args) use 
         return $response->withRedirect('/register');
     }
 
-    R::exec("INSERT INTO users (usr_email, usr_password) VALUES (:usr_email, :usr_password)", [
+    R::exec("INSERT INTO users (usr_type, usr_email, usr_password) VALUES ('admin', :usr_email, :usr_password)", [
         'usr_email' => $email,
         'usr_password' => md5($password)
     ]);
