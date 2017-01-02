@@ -68,9 +68,9 @@ class Query
                 $status = false;
                 $error = $e->getMessage();
             }
-        }
 
-        $this->addToQueries($data['columns'], $data['rows']);
+            $this->addToQueries($data['columns'], $data['rows']);
+        }
 
 
         return [

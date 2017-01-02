@@ -134,14 +134,19 @@ $app->get('/connections/remove/{cnn_id}', function (Request $request, Response $
 
 $app->post('/connections/check', function (Request $request, Response $response, $args) use ($app) {
 
+    $connection = [
+        'cnn_type' => $request->getParam('cnn_type'),
+        'cnn_settings' => [
+            'cnn_host' => $request->getParam('cnn_host'),
+            'cnn_port' => $request->getParam('cnn_port'),
+            'cnn_username' => $request->getParam('cnn_username'),
+            'cnn_password' => $request->getParam('cnn_password'),
+            'cnn_database' => $request->getParam('cnn_database')
+        ]
+    ];
+
     try {
-        new Connection(0, $request->getParam('cnn_type'), [
-            'host' => $request->getParam('cnn_host'),
-            'port' => $request->getParam('cnn_port'),
-            'username' => $request->getParam('cnn_username'),
-            'password' => $request->getParam('cnn_password'),
-            'database' => $request->getParam('cnn_database')
-        ]);
+        new Connection($connection);
     } catch (Exception $e) {
         return $response->withJson(['success' => false, 'message' => $e->getMessage()]);
     }

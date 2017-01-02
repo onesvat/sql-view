@@ -44,13 +44,20 @@ $app->post('/login', function (Request $request, Response $response, $args) use 
 
 });
 
-$app->get('/register', function (Request $request, Response $response, $args) use ($app) {
+$app->get('/setup', function (Request $request, Response $response, $args) use ($app) {
     $app->extra['messages'] = $this->flash->getMessages();
 
-    return $this->view->render($response, 'register.html.twig', array_merge($app->extra, $args));
+    $super_admin = R::getCell("SELECT set_value FROM settings WHERE set_key = 'super_admin'");
+
+    if ($super_admin) {
+        $notFoundHandler = $this->get('notFoundHandler');
+        return $notFoundHandler($request, $response);
+    }
+
+    return $this->view->render($response, 'setup.html.twig', array_merge($app->extra, $args));
 });
 
-$app->post('/register', function (Request $request, Response $response, $args) use ($app) {
+$app->post('/setup', function (Request $request, Response $response, $args) use ($app) {
     $email = $request->getParam('email');
     $password = $request->getParam('password');
     $password_check = $request->getParam('password_check');
@@ -61,10 +68,14 @@ $app->post('/register', function (Request $request, Response $response, $args) u
         return $response->withRedirect('/register');
     }
 
-    R::exec("INSERT INTO users (usr_status, usr_email, usr_password) VALUES ('active', :usr_email, :usr_password)", [
+    R::exec("INSERT INTO users (usr_email, usr_password) VALUES (:usr_email, :usr_password)", [
         'usr_email' => $email,
         'usr_password' => md5($password)
     ]);
+
+    $usr_id = R::getInsertID();
+
+    R::exec("INSERT INTO settings (set_key, set_value) VALUES (:set_key, :set_value)", ['set_key' => 'super_admin', 'set_value' => $usr_id]);
 
     $this->flash->addMessage('success', "You may login now");
 

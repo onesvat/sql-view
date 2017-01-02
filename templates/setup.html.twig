@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>SQLView - Register</title>
+    <title>SQLView - Setup</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -42,10 +42,10 @@
                 {% include 'inc/messages.html.twig' %}
 
                 <div class="panel-heading">
-                    <h3 class="panel-title">Register</h3>
+                    <h3 class="panel-title">Setup</h3>
                 </div>
                 <div class="panel-body">
-                    <form method="post" action="/register">
+                    <form method="post" action="/setup">
                         <fieldset>
                             <div class="form-group">
                                 <input class="form-control" placeholder="E-mail" name="email" type="email" required
@@ -59,15 +59,7 @@
                                 <input class="form-control" placeholder="Password Again" name="password_check"
                                        type="password" required>
                             </div>
-                            <div class="checkbox">
-                                <label>
-                                    <input name="terms" type="checkbox" value="yes" required>I accept terms and
-                                    conditions
-                                </label>
-
-                                <div class="pull-right"><a href="/login">Login</a></div>
-                            </div>
-                            <input type="submit" value="Login" class="btn btn-lg btn-success btn-block">
+                            <input type="submit" value="Setup" class="btn btn-lg btn-success btn-block">
                         </fieldset>
                     </form>
                 </div>

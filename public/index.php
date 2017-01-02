@@ -52,6 +52,9 @@ $admin_auth = function (Request $request, Response $response, $next) use ($app) 
 
 // User Auth
 $user_auth = function (Request $request, Response $response, $next) use ($app) {
+    $route = $request->getAttribute('route');
+    $urls = explode("/", $route->getPattern());
+    $method = $urls[1];
 
     // Check login
     if (empty($_SESSION['usr_id'])) {
@@ -71,6 +74,7 @@ $user_auth = function (Request $request, Response $response, $next) use ($app) {
     // Fill user fields
     $app->extra['user'] = $user;
 
+
     if ($user['usr_type'] == "admin") {
         // full-access
 
@@ -87,7 +91,12 @@ $user_auth = function (Request $request, Response $response, $next) use ($app) {
         }
 
         if (count($connection_ids) == 0) {
-            return $this->view->render($response, 'error.html.twig', array_merge($app->extra));
+            if ($method != "connections" && $method != "users") {
+                if ($user['usr_type'] == "admin")
+                    return $this->view->render($response, 'errors/no_connection_admin.html.twig', array_merge($app->extra));
+                else
+                    return $this->view->render($response, 'errors/no_connection.html.twig', array_merge($app->extra));
+            }
         } else if (count($connection_ids) == 1) {
             $connections = R::getAll("SELECT * FROM connections WHERE cnn_id = :cnn_id", ['cnn_id' => $connection_ids[0]]);
         } else {
@@ -95,8 +104,13 @@ $user_auth = function (Request $request, Response $response, $next) use ($app) {
         }
     }
 
-    if (count($connections) == 0) {
-        return $this->view->render($response, 'errors/no_connection.html.twig', array_merge($app->extra));
+    if ($method != "connections" && $method != "users") {
+        if (count($connections) == 0) {
+            if ($user['usr_type'] == "admin")
+                return $this->view->render($response, 'errors/no_connection_admin.html.twig', array_merge($app->extra));
+            else
+                return $this->view->render($response, 'errors/no_connection.html.twig', array_merge($app->extra));
+        }
     }
 
     $active_connection = false;
@@ -122,6 +136,7 @@ $user_auth = function (Request $request, Response $response, $next) use ($app) {
 
     $app->extra['all_connections'] = $connections;
     $app->extra['active_connection'] = $active_connection;
+
 
     // Get Flash Messages
     $app->extra['messages'] = $this->flash->getMessages();
