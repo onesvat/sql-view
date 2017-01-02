@@ -142,7 +142,20 @@ class Connection
 
     private function getPostgresqlFields()
     {
-        return [];
+        $stmt = $this->pdo->prepare("SELECT TABLE_NAME table_name, COLUMN_NAME column_name, COLUMN_TYPE column_type, DATA_TYPE column_data_type FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=:table_schema");
+        $stmt->execute(['table_schema' => $this->connection['cnn_settings']['cnn_database']]);
+        $fields = $stmt->fetchAll();
+
+        $tables = [];
+        foreach ($fields as $field) {
+            if (!array_key_exists($field['table_name'], $tables)) {
+                $tables[$field['table_name']] = ['table_name' => $field['table_name'], 'columns' => []];
+            }
+
+            $tables[$field['table_name']]['columns'][] = ['column_name' => $field['column_name'], 'column_type' => $field['column_type'], 'column_data_type' => $field['column_data_type']];
+        }
+
+        return $tables;
     }
 
     public static function getConnectionsWithPermissions($usr_id)
