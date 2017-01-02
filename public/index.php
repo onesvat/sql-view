@@ -126,11 +126,14 @@ $user_auth = function (Request $request, Response $response, $next) use ($app) {
         }
     }
 
-    if (!$active_connection) {
-        $active_connection = $connections[0];
+    if ($method != "connections" && $method != "users") {
+        if (!$active_connection) {
+            $active_connection = $connections[0];
 
-        R::exec("REPLACE INTO active_connections SET atc_usr_id = :usr_id, atc_active_cnn_id = :cnn_id", ['usr_id' => $user['usr_id'], 'cnn_id' => $active_connection['cnn_id']]);
+            R::exec("REPLACE INTO active_connections SET atc_usr_id = :usr_id, atc_active_cnn_id = :cnn_id", ['usr_id' => $user['usr_id'], 'cnn_id' => $active_connection['cnn_id']]);
+        }
     }
+
 
     $active_connection['cnn_settings'] = json_decode($active_connection['cnn_connection'], true);
 
