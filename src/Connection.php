@@ -142,7 +142,7 @@ class Connection
 
     private function getPostgresqlFields()
     {
-        $stmt = $this->pdo->prepare("SELECT TABLE_NAME table_name, COLUMN_NAME column_name, COLUMN_TYPE column_type, DATA_TYPE column_data_type FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=:table_schema");
+        $stmt = $this->pdo->prepare("SELECT TABLE_NAME table_name, COLUMN_NAME column_name, DATA_TYPE column_data_type FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=:table_schema");
         $stmt->execute(['table_schema' => $this->connection['cnn_settings']['cnn_database']]);
         $fields = $stmt->fetchAll();
 
@@ -152,7 +152,7 @@ class Connection
                 $tables[$field['table_name']] = ['table_name' => $field['table_name'], 'columns' => []];
             }
 
-            $tables[$field['table_name']]['columns'][] = ['column_name' => $field['column_name'], 'column_type' => $field['column_type'], 'column_data_type' => $field['column_data_type']];
+            $tables[$field['table_name']]['columns'][] = ['column_name' => $field['column_name'], 'column_type' => $field['column_data_type'], 'column_data_type' => $field['column_data_type']];
         }
 
         return $tables;
