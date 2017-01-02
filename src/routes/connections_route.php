@@ -111,8 +111,7 @@ $app->post('/connections/edit/{cnn_id}', function (Request $request, Response $r
         ]);
 
 
-    R::exec("UPDATE connections SET cnn_user = :cnn_user, cnn_name = :cnn_name, cnn_type = :cnn_type, cnn_connection = :cnn_connection, cnn_created_date = :cnn_created_date, cnn_access_date = :cnn_access_date WHERE cnn_id = :cnn_id", [
-        'cnn_user' => $_SESSION['usr_id'],
+    R::exec("UPDATE connections SET  cnn_name = :cnn_name, cnn_type = :cnn_type, cnn_connection = :cnn_connection, cnn_created_date = :cnn_created_date, cnn_access_date = :cnn_access_date WHERE cnn_id = :cnn_id", [
         'cnn_name' => $request->getParam('cnn_name'),
         'cnn_type' => $request->getParam('cnn_type'),
         'cnn_connection' => $cnn_connection,
