@@ -151,7 +151,7 @@ require __DIR__ . '/../src/Connection.php';
 // Add routes
 require __DIR__ . '/../src/routes/home_route.php';
 require __DIR__ . '/../src/routes/dashboard_route.php';
-require __DIR__ . '/../src/routes/favorite_route.php';
+require __DIR__ . '/../src/routes/favorites_route.php';
 require __DIR__ . '/../src/routes/query_route.php';
 require __DIR__ . '/../src/routes/connections_route.php';
 require __DIR__ . '/../src/routes/users_route.php';

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% include 'inc/header.html.twig' %}
+    <title>SQLView - Favorites</title>
+</head>
+
+<body>
+
+{% include 'inc/nav.html.twig' with {'page': 'favorites'} %}
+
+<div id="wrapper">
+
+    <div class="container">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Favorite Queries
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+
+                                <table class="table table-bordered table-hover table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>Query</th>
+                                        <th>Connection</th>
+                                        <th>Cache</th>
+                                        <th>URL</th>
+                                        <th width="200">Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for favorite in favorites %}
+                                        <tr>
+                                            <td>{{ favorite.que_string }}</td>
+                                            <td>{{ favorite.cnn_name }}</td>
+                                            <td>
+                                                <select class="cache" data-hash="{{ favorite.que_hash }}">
+                                                    <option {% if favorite.que_cache == 0 %}selected{% endif %}
+                                                            value="0">Disabled
+                                                    </option>
+                                                    <option {% if favorite.que_cache == 60 %}selected{% endif %}
+                                                            value="60">1 Min
+                                                    </option>
+                                                    <option {% if favorite.que_cache == 300 %}selected{% endif %}
+                                                            value="300">5 Min
+                                                    </option>
+                                                    <option {% if favorite.que_cache == 600 %}selected{% endif %}
+                                                            value="600">10 Min
+                                                    </option>
+                                                    <option {% if favorite.que_cache == 1800 %}selected{% endif %}
+                                                            value="1800">30 Min
+                                                    </option>
+                                                    <option {% if favorite.que_cache == 3600 %}selected{% endif %}
+                                                            value="3600">1 Hour
+                                                    </option>
+                                                    <option {% if favorite.que_cache == 43200 %}selected{% endif %}
+                                                            value="43200">12 Hour
+                                                    </option>
+                                                    <option {% if favorite.que_cache == 86400 %}selected{% endif %}
+                                                            value="86400">24 Hour
+                                                    </option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <div class="input-group">
+
+                                                    <input type="text" class="form-control code_area"
+                                                           id="download_url_{{ favorite.que_hash }}"
+                                                           value="http://sql-view.app/query/{{ favorite.que_hash }}.csv">
+
+                                                    <div class="input-group-btn">
+                                                        <button type="button"
+                                                                class="btn btn-default dropdown-toggle code_are"
+                                                                data-toggle="dropdown"
+                                                                aria-haspopup="true" aria-expanded="false"><span
+                                                                    id="download_type_{{ favorite.que_hash }}">CSV</span>
+                                                            <span
+                                                                    class="caret"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu">
+                                                            <li><a href="#" class="download_csv"
+                                                                   data-hash="{{ favorite.que_hash }}">CSV</a></li>
+                                                            <li><a href="#" class="download_tsv"
+                                                                   data-hash="{{ favorite.que_hash }}">TSV</a></li>
+                                                            <li><a href="#" class="download_json"
+                                                                   data-hash="{{ favorite.que_hash }}">JSON</a></li>
+                                                        </ul>
+                                                        <a href="#" target="_blank" class="btn btn-default"
+                                                           id="download_{{ favorite.que_hash }}">Download</a>
+                                                    </div><!-- /btn-group -->
+                                                </div><!-- /input-group -->
+                                            </td>
+                                            <td>
+                                                <a class="btn btn-primary btn-sm"
+                                                   href="/query?sql={{ favorite.que_string }}">
+                                                    Query
+                                                </a>
+                                                <button type="button" class="btn btn-danger btn-sm favorite_remove"
+                                                        data-hash="{{ favorite.que_hash }}">
+                                                    Remove Favorite
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.col-lg-4 -->
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Logs
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <table class="table table-bordered table-hover table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>Query</th>
+                                        <th>Connection</th>
+                                        <th>Last Updated</th>
+                                        <th width="200">Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for log in logs %}
+                                        <tr>
+                                            <td>{{ log.que_string }}</td>
+                                            <td>{{ log.cnn_name }}</td>
+                                            <td>
+                                                {{ log.que_updated_date }}
+                                            </td>
+                                            <td class="text-center">
+                                                <a class="btn btn-primary btn-sm"
+                                                   href="/query?sql={{ log.que_string }}">
+                                                    Query
+                                                </a>
+                                                <button type="button" class="btn btn-primary btn-sm favorite"
+                                                        data-hash="{{ log.que_hash }}">
+                                                    Favorite
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.col-lg-4 -->
+        </div>
+
+    </div><!-- /.container -->
+
+</div>
+<!-- /#wrapper -->
+
+{% include 'inc/footer.html.twig' %}
+
+<script>
+
+    var domain = "http://sql-view.app/";
+
+    $("#popover").popover({ trigger: "hover" });
+
+    $(".cache").change(function () {
+        var query_hash = $(this).data("hash");
+
+        $.ajax({
+            url: "/favorites/cache",
+            type: "POST",
+            data: {query_hash: query_hash, cache: $(this).val()},
+            success: function (data, textStatus, jqXHR) {
+                swal({
+                    title: "Changed",
+                    text: "Your query was changed",
+                    type: "success"
+                }, function () {
+                    location.reload();
+                });
+            }
+        });
+    });
+
+
+    $(".favorite").click(function () {
+        var hash = $(this).data('hash');
+
+        $.ajax({
+            url: "/favorites/add",
+            type: "POST",
+            data: {query_hash: hash},
+            success: function (data, textStatus, jqXHR) {
+                swal({
+                    title: "Added",
+                    text: "Your query was added to your favorites",
+                    type: "success"
+                }, function () {
+                    location.reload();
+                });
+            }
+        });
+    });
+
+    $(".favorite_remove").click(function () {
+        var hash = $(this).data('hash');
+
+        $.ajax({
+            url: "/favorites/remove",
+            type: "POST",
+            data: {query_hash: hash},
+            success: function (data, textStatus, jqXHR) {
+                swal({
+                    title: "Removed",
+                    text: "Your query was removed to your favorites",
+                    type: "success"
+                }, function () {
+                    location.reload();
+                });
+            }
+        });
+    });
+
+
+    $(".download_csv").click(function () {
+
+        var hash = $(this).data('hash');
+        $("#download_url_" + hash).val(domain + "query/" + hash + ".csv");
+        $("#download_type_" + hash).html("CSV");
+        $("#download_" + hash).attr('href', domain + "query/" + hash + ".csv?d=1");
+    });
+
+    $(".download_tsv").click(function () {
+        var hash = $(this).data('hash');
+
+        $("#download_url_" + hash).val(domain + "query/" + hash + ".tsv");
+        $("#download_type_" + hash).html("TSV");
+        $("#download_" + hash).attr('href', domain + "query/" + hash + ".tsv?d=1");
+    });
+
+    $(".download_json").click(function () {
+        var hash = $(this).data('hash');
+        $("#download_url_" + hash).val(domain + "query/" + hash + ".json");
+        $("#download_type_" + hash).html("JSON");
+        $("#download_" + hash).attr('href', domain + "query/" + hash + ".json?d=1");
+    });
+
+    $(".code_area").focus(function () {
+        var $this = $(this);
+        $this.select();
+
+        // Work around Chrome's little problem
+        $this.mouseup(function () {
+            // Prevent further mouseup intervention
+            $this.unbind("mouseup");
+            return false;
+        });
+    });
+</script>
+</body>
+
+</html>

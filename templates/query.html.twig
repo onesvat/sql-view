@@ -51,7 +51,7 @@
                         <div class="tab-content" style="height: 430px;">
                             {% if permission == "full" %}
                                 <div role="tabpanel" class="tab-pane active" id="sql">
-                                    <pre id="editor" style="height: 400px;">SELECT * FROM users;</pre>
+                                    <pre id="editor" style="height: 400px;">{{ sql }}</pre>
                                 </div>
                             {% endif %}
                             <div role="tabpanel" class="tab-pane {% if permission != "full" %} active {% endif %}"
@@ -113,6 +113,11 @@
                                 <button type="button" class="btn btn-primary" id="run_query">
                                     Run Query
                                 </button>
+
+                                <button type="button" class="btn btn-primary" id="favorite" style="display: none;">
+                                    Add Favorites
+                                </button>
+
                             </div>
 
 
@@ -125,7 +130,7 @@
 
                             <div class="input-group">
 
-                                <input type="text" class="form-control" id="download_url">
+                                <input type="text" class="form-control code_area" id="download_url">
 
                                 <div class="input-group-btn">
                                     <button type="button" class="btn btn-default dropdown-toggle code_are"
@@ -231,6 +236,8 @@
 
                     timer_html += seconds + "." + secondTenths + "s elapsed, " + data.rows.length + " rows are returned";
 
+                    $("#favorite").show();
+                    $("#favorite").data("hash", data.query_hash)
 
                     $('#timer').html(timer_html);
 
@@ -300,6 +307,19 @@
         });
     });
 
+    $("#favorite").click(function () {
+        var hash = $("#favorite").data('hash');
+
+        $.ajax({
+            url: "/favorites/add",
+            type: "POST",
+            data: {query_hash: hash},
+            success: function (data, textStatus, jqXHR) {
+                swal("Added", "Your query was added to your favorites", "success");
+            }
+        });
+    });
+
 </script>
 
 <script>
@@ -325,7 +345,7 @@
             var $option = $('<option />')
                     .prop('value', data[key]['id'])
                     .text(data[key]['text'])
-                    ;
+                ;
             $input.append($option)
         }
         $input.trigger('change');

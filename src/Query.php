@@ -47,7 +47,7 @@ class Query
         $start = microtime(true);
 
 
-        if ($cache === true || $cache != "false") {
+        if ($cache === true) {
             $data = $this->getFromCache();
             $results_from_cache = true;
         }
@@ -57,7 +57,9 @@ class Query
             try {
                 $stmt = $this->pdo->prepare($this->query);
                 $stmt->execute();
-                $rows = $stmt->fetchAll();
+
+                $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
                 $columns = [];
                 for ($i = 0; $i < $stmt->columnCount(); $i++) {
                     $col = $stmt->getColumnMeta($i);
@@ -72,6 +74,11 @@ class Query
             $this->addToQueries($data['columns'], $data['rows']);
         }
 
+        $new_rows = [];
+
+        foreach ($data['rows'] as $row) {
+            $new_rows[] = array_values($row);
+        }
 
         return [
             'status' => $status,
@@ -79,7 +86,7 @@ class Query
             'query_hash' => $this->query_hash,
             'timestamp' => $data['timestamp'],
             'time-elapsed' => microtime(true) - $start,
-            'rows' => $data['rows'],
+            'rows' => $new_rows,
             'columns' => $data['columns'],
             'error' => $error
         ];
@@ -100,7 +107,6 @@ class Query
 
     private function addToQueries($columns, $rows)
     {
-
 
         $result_string = json_encode(['columns' => $columns, 'rows' => $rows]);
 

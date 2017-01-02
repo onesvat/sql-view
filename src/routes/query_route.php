@@ -26,12 +26,20 @@ $app->get('/query', function (Request $request, Response $response, $args) use (
     $args['tree'] = json_encode($tree);
     $args['permission'] = $connection->getPermissionType();
 
+
+    $args['sql'] = $request->getParam('sql');
+
+
     return $this->view->render($response, 'query.html.twig', array_merge($app->extra, $args));
 })->add($user_auth);
 
 $app->post('/query/run', function (Request $request, Response $response, $args) use ($app) {
     $query_string = $request->getParam('query');
-    $cache = $request->getParam('cache');
+
+    if($request->getParam('cache') == "true")
+        $cache = true;
+    else
+        $cache = false;
 
     $query = new Query($query_string, new Connection($app->extra['active_connection']), $app->extra['user']);
     $result = $query->getArray($cache);
@@ -45,7 +53,7 @@ $app->post('/query/run/gui', function (Request $request, Response $response, $ar
 
     $query_string = "SELECT " . implode(",", $fields) . " FROM " . implode(',', $tables);
 
-    if($builder['sql']) {
+    if ($builder['sql']) {
         $query_string .= " WHERE " . $builder['sql'];
     }
 
