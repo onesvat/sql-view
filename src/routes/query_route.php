@@ -36,7 +36,7 @@ $app->get('/query', function (Request $request, Response $response, $args) use (
 $app->post('/query/run', function (Request $request, Response $response, $args) use ($app) {
     $query_string = $request->getParam('query');
 
-    if($request->getParam('cache') == "true")
+    if ($request->getParam('cache') == "true")
         $cache = true;
     else
         $cache = false;
@@ -79,11 +79,21 @@ $app->post('/query/get_fields', function (Request $request, Response $response, 
 
     $tables = $connection->getFields();
 
+
     foreach ($tables as $table) {
         foreach ($table['columns'] as $column) {
             if (in_array($table['table_name'], $selected_tables)) {
                 $data[] = ["id" => $table['table_name'] . "." . $column['column_name'], "text" => $table['table_name'] . "." . $column['column_name']];
-                $filter[] = ['id' => $table['table_name'] . "." . $column['column_name'], 'label' => $table['table_name'] . "." . $column['column_name']];
+
+                if (in_array($column['column_data_type'], ['int', 'smallint', 'integer', 'float', 'double', 'decimal'])) {
+                    $filter[] = [
+                        'id' => $table['table_name'] . "." . $column['column_name'],
+                        'label' => $table['table_name'] . "." . $column['column_name'],
+                        'type' => 'integer',
+                    ];
+                } else {
+                    $filter[] = ['id' => $table['table_name'] . "." . $column['column_name'], 'label' => $table['table_name'] . "." . $column['column_name'], 'type' => 'string'];
+                }
             }
         }
     }

@@ -7,7 +7,7 @@ use Slim\Http\Response;
 $app->get('/', function (Request $request, Response $response, $args) use ($app) {
     $app->extra['messages'] = $this->flash->getMessages();
 
-    return $response->withRedirect('/dashboard');
+    return $response->withRedirect('/favorites');
 })->add($user_auth);
 
 $app->get('/connection/change/{cnn_id}', function (Request $request, Response $response, $args) use ($app) {
@@ -35,7 +35,7 @@ $app->post('/login', function (Request $request, Response $response, $args) use 
         $_SESSION['usr_id'] = $user['usr_id'];
         $_SESSION['usr_type'] = $user['usr_type'];
 
-        return $response->withRedirect('/dashboard');
+        return $response->withRedirect('/query');
     }
 
     $this->flash->addMessage('danger', "Your email or password is wrong");
