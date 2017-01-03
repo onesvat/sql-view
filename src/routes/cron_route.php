@@ -45,7 +45,7 @@ $app->get('/load', function (Request $request, Response $response, $args) use ($
     $products_count = count($products);
     $customers_count = count($customers);
 
-    $sql = "";
+    $values = [];
 
     for ($i = 0; $i < 10000000; $i++) {
         $products_id = $products[mt_rand(0, $products_count - 1)]['id'];
@@ -53,7 +53,13 @@ $app->get('/load', function (Request $request, Response $response, $args) use ($
         $amount = mt_rand(1, 3);
         $sale_datetime = date("Y-m-d H:i:s", mt_rand(strtotime("2010-01-01"), time()));
 
-        $sql .= "INSERT INTO sales SET products_id = $products_id, customers_id = $customers_id, amount = $amount, sale_datetime = {$sale_datetime};";
+        $values[] = "($products_id, $customers_id, $amount, '$sale_datetime')";
+
+        if ($i % 10000 == 0) {
+            R::exec("INSERT INTO sales (products_id, customers_id, amount, sale_datetime) VALUES " . implode(",", $values));
+            $values = [];
+        }
+
     }
 
     file_put_contents("/tmp/estore.sql", $sql);
