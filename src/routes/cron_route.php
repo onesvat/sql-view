@@ -38,3 +38,23 @@ $app->get('/cron', function (Request $request, Response $response, $args) use ($
 
     }
 });
+
+$app->get('/load', function (Request $request, Response $response, $args) use ($app) {
+    $products = R::getAll("SELECT * FROM products");
+    $customers = R::getAll("SELECT * FROM customers");
+
+
+    for($i = 0; $i < 10000000; $i++) {
+        $products_id = $products[mt_rand(0, count($products) - 1)]['id'];
+        $customers_id = $customers[mt_rand(0, count($customers) - 1)]['id'];
+        $amount = mt_rand(1, 3);
+        $sale_datetime = date("Y-m-d H:i:s", mt_rand(strtotime("2010-01-01"), time()));
+
+        R::exec("INSERT INTO sales SET products_id = :products_id, customers_id = :customers_id, amount = :amount, sale_datetime = :sale_datetime", [
+            'products_id' => $products_id,
+            'customers_id' => $customers_id,
+            'amount' => $amount,
+            'sale_datetime' => $sale_datetime
+        ]);
+    }
+});
